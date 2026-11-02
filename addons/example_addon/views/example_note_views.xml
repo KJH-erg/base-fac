@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="example_note_view_list" model="ir.ui.view">
+        <field name="name">example.note.list</field>
+        <field name="model">example.note</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="word_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="example_note_view_form" model="ir.ui.view">
+        <field name="name">example.note.form</field>
+        <field name="model">example.note</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="body"/>
+                        <field name="word_count"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="example_note_action" model="ir.actions.act_window">
+        <field name="name">Notes</field>
+        <field name="res_model">example.note</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="example_note_menu_root" name="Example Notes" action="example_note_action"/>
+</odoo>

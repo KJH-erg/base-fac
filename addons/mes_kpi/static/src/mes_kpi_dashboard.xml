@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mes_kpi.Dashboard">
+        <div class="o_action o_mes_kpi_dashboard overflow-auto h-100 p-3">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <h2 class="mb-0 me-auto">KPI Dashboard</h2>
+                <input type="date" class="form-control w-auto" aria-label="From" t-att-value="this.dateFrom()"
+                    t-on-change="(ev) => this.onDateChange(this.dateFrom, ev)"/>
+                <span>–</span>
+                <input type="date" class="form-control w-auto" aria-label="To" t-att-value="this.dateTo()"
+                    t-on-change="(ev) => this.onDateChange(this.dateTo, ev)"/>
+                <button class="btn btn-secondary" t-on-click="() => this.openAnalysis()">Analysis</button>
+            </div>
+            <t t-set="data" t-value="this.data()"/>
+            <div class="row g-2 mb-3">
+                <t t-foreach="this.cards" t-as="card" t-key="card.key">
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="border rounded p-3 h-100 o_mes_kpi_card">
+                            <div class="text-muted small" t-out="card.label"/>
+                            <div class="fs-3 fw-bold" t-out="this.formatPercent(data.overall[card.key])"/>
+                        </div>
+                    </div>
+                </t>
+            </div>
+            <div t-if="!data.lines.length" class="alert alert-info" role="alert">
+                No confirmed plans or results in this period.
+            </div>
+            <div t-else="" class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th class="text-end">OEE</th>
+                            <th class="text-end">Target</th>
+                            <th class="text-end">Availability</th>
+                            <th class="text-end">Performance</th>
+                            <th class="text-end">Quality</th>
+                            <th class="text-end">Planned</th>
+                            <th class="text-end">Output</th>
+                            <th class="text-end">Achievement</th>
+                            <th class="text-end">Defects</th>
+                            <th class="text-end">Downtime (min)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="data.lines" t-as="line" t-key="line.workcenter_id"
+                            class="cursor-pointer" t-on-click="() => this.openAnalysis(line)">
+                            <td t-out="line.workcenter_name"/>
+                            <td class="text-end fw-bold" t-att-class="this.isBelowTarget(line) ? 'text-danger' : ''"
+                                t-out="this.formatPercent(line.oee)"/>
+                            <td class="text-end" t-out="line.oee_target ? this.formatPercent(line.oee_target) : '—'"/>
+                            <td class="text-end" t-out="this.formatPercent(line.availability)"/>
+                            <td class="text-end" t-out="this.formatPercent(line.performance)"/>
+                            <td class="text-end" t-out="this.formatPercent(line.quality)"/>
+                            <td class="text-end" t-out="this.formatNumber(line.planned_qty)"/>
+                            <td class="text-end" t-out="this.formatNumber(line.output_qty)"/>
+                            <td class="text-end" t-out="this.formatPercent(line.achievement)"/>
+                            <td class="text-end" t-out="this.formatNumber(line.defect_qty)"/>
+                            <td class="text-end" t-out="this.formatNumber(line.downtime_minutes)"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>

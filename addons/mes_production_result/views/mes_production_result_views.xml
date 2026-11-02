@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_production_result_view_list" model="ir.ui.view">
+        <field name="name">mes.production.result.list</field>
+        <field name="model">mes.production.result</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="shift" optional="show"/>
+                <field name="plan_id" optional="show"/>
+                <field name="workcenter_id"/>
+                <field name="step_id" optional="show"/>
+                <field name="product_id"/>
+                <field name="good_qty" sum="Total"/>
+                <field name="defect_qty" sum="Total"/>
+                <field name="defect_rate" digits="[10,1]" optional="show"/>
+                <field name="run_minutes" sum="Total" optional="hide"/>
+                <field name="downtime_minutes" sum="Total" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mes_production_result_view_form" model="ir.ui.view">
+        <field name="name">mes.production.result.form</field>
+        <field name="model">mes.production.result</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group string="Context">
+                            <field name="date" readonly="state == 'done'"/>
+                            <field name="shift" readonly="state == 'done'"/>
+                            <field name="plan_id" readonly="state == 'done'"/>
+                            <field name="routing_id" invisible="1"/>
+                            <field name="step_id" readonly="state == 'done'" invisible="not routing_id"/>
+                            <field name="workcenter_id" readonly="state == 'done'"/>
+                            <field name="product_id" readonly="state == 'done'"/>
+                            <field name="user_id" readonly="state == 'done'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Quantities">
+                            <field name="good_qty" readonly="state == 'done'"/>
+                            <field name="defect_qty" readonly="state == 'done'"/>
+                            <field name="total_qty"/>
+                            <field name="defect_rate" digits="[10,1]"/>
+                            <field name="output_qty"/>
+                        </group>
+                        <group string="Time">
+                            <field name="date_start" readonly="state == 'done'"/>
+                            <field name="date_end" readonly="state == 'done'"/>
+                            <field name="downtime_minutes" readonly="state == 'done'"/>
+                            <field name="work_minutes"/>
+                            <field name="run_minutes"/>
+                            <field name="standard_minutes"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes"><field name="note" readonly="state == 'done'"/></page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mes_production_result_view_pivot" model="ir.ui.view">
+        <field name="name">mes.production.result.pivot</field>
+        <field name="model">mes.production.result</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="workcenter_id" type="row"/>
+                <field name="step_id" type="row"/>
+                <field name="date" interval="week" type="col"/>
+                <field name="good_qty" type="measure"/>
+                <field name="defect_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="mes_production_result_view_graph" model="ir.ui.view">
+        <field name="name">mes.production.result.graph</field>
+        <field name="model">mes.production.result</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="workcenter_id"/>
+                <field name="good_qty" type="measure"/>
+                <field name="defect_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="mes_production_result_view_search" model="ir.ui.view">
+        <field name="name">mes.production.result.search</field>
+        <field name="model">mes.production.result</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="plan_id"/>
+                <field name="product_id"/>
+                <field name="workcenter_id"/>
+                <field name="user_id"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="Confirmed" domain="[('state', '=', 'done')]"/>
+                <filter name="date" string="Production Date" date="date"/>
+                <filter name="group_workcenter" string="Line" context="{'group_by': 'workcenter_id'}"/>
+                <filter name="group_step" string="Step" context="{'group_by': 'step_id'}"/>
+                <filter name="group_shift" string="Shift" context="{'group_by': 'shift'}"/>
+                <filter name="group_date" string="Daily" context="{'group_by': 'date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mes_production_result_action" model="ir.actions.act_window">
+        <field name="name">Production Results</field>
+        <field name="res_model">mes.production.result</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+    </record>
+
+    <menuitem id="menu_mes_production_result" name="Production Results" parent="mes_routing.menu_mes_operations"
+        action="mes_production_result_action" sequence="20"/>
+</odoo>

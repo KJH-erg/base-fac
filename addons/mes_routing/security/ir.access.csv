@@ -1,0 +1,7 @@
+id,name,model_id,group_id/id,operation,domain
+access_mes_routing_user,mes.routing.user,mes.routing,mrp.group_mrp_user,r,
+access_mes_routing_manager,mes.routing.manager,mes.routing,mrp.group_mrp_manager,crud,
+access_mes_routing_company,mes.routing multi-company,mes.routing,,crud,"[('company_id', 'in', company_ids)]"
+access_mes_routing_step_user,mes.routing.step.user,mes.routing.step,mrp.group_mrp_user,r,
+access_mes_routing_step_manager,mes.routing.step.manager,mes.routing.step,mrp.group_mrp_manager,crud,
+access_mes_routing_step_company,mes.routing.step multi-company,mes.routing.step,,crud,"[('company_id', 'in', company_ids)]"

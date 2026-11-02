@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_production_plan_view_list_results" model="ir.ui.view">
+        <field name="name">mes.production.plan.list.results</field>
+        <field name="model">mes.production.plan</field>
+        <field name="inherit_id" ref="mes_planning.mes_production_plan_view_list"/>
+        <field name="arch" type="xml">
+            <field name="planned_minutes" position="before">
+                <field name="good_qty"/>
+                <field name="achievement_percent" widget="progressbar"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_view_form_results" model="ir.ui.view">
+        <field name="name">mes.production.plan.form.results</field>
+        <field name="model">mes.production.plan</field>
+        <field name="inherit_id" ref="mes_planning.mes_production_plan_view_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_open_results" type="object" class="oe_stat_button" icon="bar_chart">
+                    <field name="good_qty" widget="statinfo" string="Output"/>
+                </button>
+            </div>
+            <field name="planned_minutes" position="before">
+                <field name="good_qty"/>
+                <field name="defect_qty"/>
+                <field name="achievement_percent" widget="progressbar"/>
+            </field>
+        </field>
+    </record>
+</odoo>

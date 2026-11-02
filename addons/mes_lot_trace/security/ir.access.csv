@@ -1,0 +1,3 @@
+id,name,model_id,group_id/id,operation,domain
+access_mes_lot_trace_user,mes.lot.trace.user,mes.lot.trace,mrp.group_mrp_user,crud,
+access_mes_lot_trace_line_user,mes.lot.trace.line.user,mes.lot.trace.line,mrp.group_mrp_user,crud,

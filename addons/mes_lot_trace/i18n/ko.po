@@ -1,0 +1,197 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mes_lot_trace
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0-20261015\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-02 01:18+0000\n"
+"PO-Revision-Date: 2026-11-02 01:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__forward_count
+msgid "Affected Lots"
+msgstr "영향받는 LOT"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__forward_on_hand
+msgid "Affected Qty On Hand"
+msgstr "영향받는 보유 수량"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields.selection,name:mes_lot_trace.selection__mes_lot_trace_line__direction__backward
+msgid "Backward"
+msgstr "역방향"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields.selection,name:mes_lot_trace.selection__mes_lot_trace__direction__backward
+msgid "Backward (made from)"
+msgstr "역방향 (원재료 추적)"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields.selection,name:mes_lot_trace.selection__mes_lot_trace__direction__both
+msgid "Both"
+msgstr "양방향"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__create_uid
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__create_uid
+msgid "Created by"
+msgstr "작성자"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__create_date
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__create_date
+msgid "Created on"
+msgstr "작성일자"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__date
+msgid "Date"
+msgstr "날짜"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__direction
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__direction
+msgid "Direction"
+msgstr "방향"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__display_name
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__display_name
+#: model:ir.model.fields,field_description:mes_lot_trace.field_stock_lot__display_name
+msgid "Display Name"
+msgstr "표시명"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields.selection,name:mes_lot_trace.selection__mes_lot_trace_line__direction__forward
+msgid "Forward"
+msgstr "정방향"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields.selection,name:mes_lot_trace.selection__mes_lot_trace__direction__forward
+msgid "Forward (went into)"
+msgstr "정방향 (사용처 추적)"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__id
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__id
+#: model:ir.model.fields,field_description:mes_lot_trace.field_stock_lot__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__write_uid
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__write_uid
+msgid "Last Updated by"
+msgstr "최근 갱신한 사람"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__write_date
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__write_date
+msgid "Last Updated on"
+msgstr "최근 갱신 일자"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__depth
+msgid "Level"
+msgstr "레벨"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__parent_lot_id
+msgid "Linked From"
+msgstr "연결 LOT"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__lot_id
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__lot_id
+msgid "Lot"
+msgstr "LOT"
+
+#. module: mes_lot_trace
+#. odoo-python
+#: code:addons/mes_lot_trace/models/mes_lot_trace.py:0
+#: model:ir.actions.act_window,name:mes_lot_trace.mes_lot_trace_action
+#: model:ir.ui.menu,name:mes_lot_trace.menu_mes_lot_trace
+msgid "Lot Trace"
+msgstr "LOT 추적"
+
+#. module: mes_lot_trace
+#: model:ir.model,name:mes_lot_trace.model_stock_lot
+msgid "Lot/Serial"
+msgstr "LOT/일련번호"
+
+#. module: mes_lot_trace
+#: model:ir.model,name:mes_lot_trace.model_mes_lot_trace
+#: model:ir.module.module,shortdesc:base.module_mes_lot_trace
+msgid "MES Lot Trace"
+msgstr "MES LOT 추적"
+
+#. module: mes_lot_trace
+#: model:ir.model,name:mes_lot_trace.model_mes_lot_trace_line
+msgid "MES Lot Trace Line"
+msgstr "MES LOT 추적 내역"
+
+#. module: mes_lot_trace
+#: model_terms:ir.ui.view,arch_db:mes_lot_trace.view_production_lot_form_mes_trace
+msgid "MES Trace"
+msgstr "MES 추적"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__production_id
+msgid "Manufacturing Order"
+msgstr "제조 주문"
+
+#. module: mes_lot_trace
+#: model_terms:ir.ui.view,arch_db:mes_lot_trace.mes_lot_trace_view_form
+msgid ""
+"No linked lots found. Only lot-tracked products on completed manufacturing "
+"orders can be traced."
+msgstr "연결된 LOT가 없습니다. 완료된 제조 주문의 LOT 추적 품목만 추적할 수 있습니다."
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__on_hand_qty
+msgid "On Hand"
+msgstr "보유량"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__product_id
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__product_id
+msgid "Product"
+msgstr "품목"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__quantity
+msgid "Qty"
+msgstr "수량"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__backward_count
+msgid "Source Lots"
+msgstr "원천 LOT"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__line_ids
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace_line__trace_id
+#: model_terms:ir.ui.view,arch_db:mes_lot_trace.mes_lot_trace_view_form
+msgid "Trace"
+msgstr "추적"
+
+#. module: mes_lot_trace
+#: model:ir.module.module,summary:base.module_mes_lot_trace
+msgid ""
+"Trace a lot forward to what it went into and backward to what it was made "
+"from"
+msgstr "LOT의 사용처(정방향)와 원재료(역방향)를 추적"
+
+#. module: mes_lot_trace
+#: model:ir.model.fields,field_description:mes_lot_trace.field_mes_lot_trace__traced
+msgid "Traced"
+msgstr "추적 완료"

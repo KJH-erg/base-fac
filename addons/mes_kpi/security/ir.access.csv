@@ -1,0 +1,3 @@
+id,name,model_id,group_id/id,operation,domain
+access_mes_kpi_report_user,mes.kpi.report.user,mes.kpi.report,mrp.group_mrp_user,r,
+access_mes_kpi_report_company,mes.kpi.report multi-company,mes.kpi.report,,crud,"[('company_id', 'in', company_ids)]"

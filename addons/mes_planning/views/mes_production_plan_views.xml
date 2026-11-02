@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_production_plan_view_list" model="ir.ui.view">
+        <field name="name">mes.production.plan.list</field>
+        <field name="model">mes.production.plan</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="load_percent &gt; 100 or is_late" decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="date_planned"/>
+                <field name="date_deadline" optional="show"/>
+                <field name="workcenter_id"/>
+                <field name="product_id"/>
+                <field name="qty"/>
+                <field name="uom_id" optional="hide"/>
+                <field name="planned_minutes" optional="show"/>
+                <field name="load_percent" optional="show" widget="float" digits="[10,0]"/>
+                <field name="is_late" column_invisible="1"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-primary="state == 'confirmed'" decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_view_form" model="ir.ui.view">
+        <field name="name">mes.production.plan.form</field>
+        <field name="model">mes.production.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_create_production" type="object" string="Create Manufacturing Order" invisible="state != 'confirmed' or production_id"/>
+                    <button name="action_done" type="object" string="Mark Done" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_production" type="object" class="oe_stat_button" icon="build" invisible="not production_id">
+                            <field name="production_id" widget="statinfo" string="MO"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <div class="alert alert-warning" role="alert" invisible="load_percent &lt;= 100">
+                        This line is over capacity on the planned date.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not is_late">
+                        The planned date is after the deadline.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="product_id" readonly="state in ('done', 'cancel')"/>
+                            <label for="qty"/>
+                            <div class="d-flex gap-2">
+                                <field name="qty" readonly="state in ('done', 'cancel')" class="w-auto"/>
+                                <field name="uom_id" class="w-auto" nolabel="1" options="{'no_open': True}"/>
+                            </div>
+                            <field name="routing_id" readonly="state in ('done', 'cancel')"/>
+                            <field name="workcenter_id" readonly="state in ('done', 'cancel')"/>
+                        </group>
+                        <group>
+                            <field name="date_planned" readonly="state in ('done', 'cancel')"/>
+                            <field name="date_deadline"/>
+                            <field name="planned_minutes"/>
+                            <field name="capacity_minutes"/>
+                            <field name="load_percent" digits="[10,0]"/>
+                            <field name="is_late" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes"><field name="note"/></page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_view_calendar" model="ir.ui.view">
+        <field name="name">mes.production.plan.calendar</field>
+        <field name="model">mes.production.plan</field>
+        <field name="arch" type="xml">
+            <calendar date_start="date_planned" color="workcenter_id" mode="month" quick_create="0">
+                <field name="workcenter_id" filters="1"/>
+                <field name="product_id"/>
+                <field name="qty"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_view_pivot" model="ir.ui.view">
+        <field name="name">mes.production.plan.pivot</field>
+        <field name="model">mes.production.plan</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="workcenter_id" type="row"/>
+                <field name="date_planned" interval="week" type="col"/>
+                <field name="planned_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_view_graph" model="ir.ui.view">
+        <field name="name">mes.production.plan.graph</field>
+        <field name="model">mes.production.plan</field>
+        <field name="arch" type="xml">
+            <graph type="bar" stacked="1">
+                <field name="date_planned" interval="day"/>
+                <field name="workcenter_id"/>
+                <field name="planned_minutes" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_view_search" model="ir.ui.view">
+        <field name="name">mes.production.plan.search</field>
+        <field name="model">mes.production.plan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="workcenter_id"/>
+                <filter name="open" string="Open" domain="[('state', 'in', ('draft', 'confirmed'))]"/>
+                <filter name="date_planned" string="Planned Date" date="date_planned"/>
+                <filter name="group_workcenter" string="Line" context="{'group_by': 'workcenter_id'}"/>
+                <filter name="group_date" string="Daily" context="{'group_by': 'date_planned:day'}"/>
+                <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mes_production_plan_action" model="ir.actions.act_window">
+        <field name="name">Production Plans</field>
+        <field name="res_model">mes.production.plan</field>
+        <field name="view_mode">list,calendar,form,pivot,graph</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <menuitem id="menu_mes_production_plan" name="Production Plans" parent="mes_routing.menu_mes_operations"
+        action="mes_production_plan_action" sequence="10"/>
+</odoo>

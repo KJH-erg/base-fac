@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_kpi_report_view_pivot" model="ir.ui.view">
+        <field name="name">mes.kpi.report.pivot</field>
+        <field name="model">mes.kpi.report</field>
+        <field name="arch" type="xml">
+            <pivot disable_linking="1">
+                <field name="workcenter_id" type="row"/>
+                <field name="date" interval="week" type="col"/>
+                <field name="planned_qty" type="measure"/>
+                <field name="output_qty" type="measure"/>
+                <field name="defect_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="mes_kpi_report_view_graph" model="ir.ui.view">
+        <field name="name">mes.kpi.report.graph</field>
+        <field name="model">mes.kpi.report</field>
+        <field name="arch" type="xml">
+            <graph type="line" disable_linking="1">
+                <field name="date" interval="day"/>
+                <field name="planned_qty" type="measure"/>
+                <field name="output_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="mes_kpi_report_view_search" model="ir.ui.view">
+        <field name="name">mes.kpi.report.search</field>
+        <field name="model">mes.kpi.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="workcenter_id"/>
+                <field name="product_id"/>
+                <filter name="date" string="Date" date="date"/>
+                <filter name="group_workcenter" string="Line" context="{'group_by': 'workcenter_id'}"/>
+                <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                <filter name="group_date" string="Daily" context="{'group_by': 'date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mes_kpi_report_action" model="ir.actions.act_window">
+        <field name="name">KPI Analysis</field>
+        <field name="res_model">mes.kpi.report</field>
+        <field name="view_mode">graph,pivot</field>
+    </record>
+
+    <record id="mes_kpi_dashboard_action" model="ir.actions.client">
+        <field name="name">KPI Dashboard</field>
+        <field name="tag">mes_kpi.dashboard</field>
+    </record>
+
+    <menuitem id="menu_mes_kpi_dashboard" name="KPI Dashboard" parent="mes_routing.menu_mes_reporting"
+        action="mes_kpi_dashboard_action" sequence="10"/>
+    <menuitem id="menu_mes_kpi_analysis" name="KPI Analysis" parent="mes_routing.menu_mes_reporting"
+        action="mes_kpi_report_action" sequence="20"/>
+</odoo>

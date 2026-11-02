@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_routing_view_list" model="ir.ui.view">
+        <field name="name">mes.routing.list</field>
+        <field name="model">mes.routing</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="product_tmpl_id"/>
+                <field name="total_setup_minutes" optional="show"/>
+                <field name="total_cycle_minutes" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mes_routing_view_form" model="ir.ui.view">
+        <field name="name">mes.routing.form</field>
+        <field name="model">mes.routing</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply_to_bom" type="object" string="Apply to BoM"
+                        class="btn-primary" invisible="not bom_id"
+                        groups="mrp.group_mrp_manager"
+                        confirm="This archives the BoM's current operations and replaces them with these steps. Continue?"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="product_tmpl_id"/>
+                            <field name="bom_id"/>
+                            <field name="total_setup_minutes"/>
+                            <field name="total_cycle_minutes"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Steps" name="steps">
+                            <field name="step_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="workcenter_id"/>
+                                    <field name="setup_minutes"/>
+                                    <field name="cycle_minutes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mes_routing_view_search" model="ir.ui.view">
+        <field name="name">mes.routing.search</field>
+        <field name="model">mes.routing</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="product_tmpl_id"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mes_routing_action" model="ir.actions.act_window">
+        <field name="name">Routings</field>
+        <field name="res_model">mes.routing</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_mes_routing" name="Routings" parent="menu_mes_configuration"
+        action="mes_routing_action" sequence="10"/>
+</odoo>

@@ -1,0 +1,252 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mes_routing
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0-20261015\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-02 01:18+0000\n"
+"PO-Revision-Date: 2026-11-02 01:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mes_routing
+#. odoo-python
+#: code:addons/mes_routing/models/mes_routing.py:0
+msgid "%s (copy)"
+msgstr "%s (사본)"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__active
+msgid "Active"
+msgstr "활성화"
+
+#. module: mes_routing
+#: model_terms:ir.ui.view,arch_db:mes_routing.mes_routing_view_form
+msgid "Apply to BoM"
+msgstr "자재명세서에 적용"
+
+#. module: mes_routing
+#: model_terms:ir.ui.view,arch_db:mes_routing.mes_routing_view_form
+#: model_terms:ir.ui.view,arch_db:mes_routing.mes_routing_view_search
+msgid "Archived"
+msgstr "보관됨"
+
+#. module: mes_routing
+#: model:ir.model.fields,help:mes_routing.field_mes_routing__bom_id
+msgid "Bill of Materials that receives these steps as operations."
+msgstr "이 단계들을 공정으로 적용받을 자재명세서입니다."
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__code
+msgid "Code"
+msgstr "코드"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__company_id
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__company_id
+msgid "Company"
+msgstr "회사"
+
+#. module: mes_routing
+#: model:ir.ui.menu,name:mes_routing.menu_mes_configuration
+msgid "Configuration"
+msgstr "환경설정"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__create_uid
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__create_uid
+msgid "Created by"
+msgstr "작성자"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__create_date
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__create_date
+msgid "Created on"
+msgstr "작성일자"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__cycle_minutes
+msgid "Cycle Minutes"
+msgstr "사이클 시간(분)"
+
+#. module: mes_routing
+#: model:ir.model.constraint,message:mes_routing.constraint_mes_routing_step_cycle_positive
+msgid "Cycle minutes cannot be negative."
+msgstr "사이클 시간은 음수일 수 없습니다."
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__display_name
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__display_name
+msgid "Display Name"
+msgstr "표시명"
+
+#. module: mes_routing
+#: model:ir.model.fields,help:mes_routing.field_mes_routing_step__setup_minutes
+msgid "Fixed minutes per batch."
+msgstr "배치당 고정 시간(분)입니다."
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__id
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__is_last_step
+msgid "Is Last Step"
+msgstr "마지막 단계 여부"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__write_uid
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__write_uid
+msgid "Last Updated by"
+msgstr "최근 갱신한 사람"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__write_date
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__write_date
+msgid "Last Updated on"
+msgstr "최근 갱신 일자"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__workcenter_id
+msgid "Line"
+msgstr "라인"
+
+#. module: mes_routing
+#: model:ir.ui.menu,name:mes_routing.menu_mes_root
+msgid "MES"
+msgstr "MES"
+
+#. module: mes_routing
+#: model:ir.model,name:mes_routing.model_mes_routing
+#: model:ir.module.module,shortdesc:base.module_mes_routing
+msgid "MES Routing"
+msgstr "MES 라우팅"
+
+#. module: mes_routing
+#: model:ir.model,name:mes_routing.model_mes_routing_step
+msgid "MES Routing Step"
+msgstr "MES 라우팅 단계"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__name
+msgid "Name"
+msgstr "이름"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__note
+msgid "Note"
+msgstr "노트"
+
+#. module: mes_routing
+#: model_terms:ir.ui.view,arch_db:mes_routing.mes_routing_view_form
+msgid "Notes"
+msgstr "메모"
+
+#. module: mes_routing
+#: model:ir.ui.menu,name:mes_routing.menu_mes_operations
+msgid "Operations"
+msgstr "운영"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__product_tmpl_id
+msgid "Product"
+msgstr "품목"
+
+#. module: mes_routing
+#: model:ir.ui.menu,name:mes_routing.menu_mes_reporting
+msgid "Reporting"
+msgstr "보고"
+
+#. module: mes_routing
+#: model:ir.module.module,summary:base.module_mes_routing
+msgid "Reusable process routes with steps, lines and standard times"
+msgstr "단계, 라인, 표준 시간을 정의하는 재사용 가능한 공정 경로"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__routing_id
+msgid "Routing"
+msgstr "라우팅"
+
+#. module: mes_routing
+#: model:ir.model.constraint,message:mes_routing.constraint_mes_routing_code_uniq
+msgid "Routing code must be unique per company."
+msgstr "라우팅 코드는 회사별로 고유해야 합니다."
+
+#. module: mes_routing
+#: model:ir.actions.act_window,name:mes_routing.mes_routing_action
+#: model:ir.ui.menu,name:mes_routing.menu_mes_routing
+msgid "Routings"
+msgstr "라우팅"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__sequence
+msgid "Sequence"
+msgstr "순서"
+
+#. module: mes_routing
+#. odoo-python
+#: code:addons/mes_routing/models/mes_routing.py:0
+msgid "Set a target BoM first."
+msgstr "먼저 대상 자재명세서를 지정하세요."
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__setup_minutes
+msgid "Setup Minutes"
+msgstr "셋업 시간(분)"
+
+#. module: mes_routing
+#: model:ir.model.constraint,message:mes_routing.constraint_mes_routing_step_setup_positive
+msgid "Setup minutes cannot be negative."
+msgstr "셋업 시간은 음수일 수 없습니다."
+
+#. module: mes_routing
+#: model:ir.model.fields,help:mes_routing.field_mes_routing_step__cycle_minutes
+msgid "Standard minutes per unit."
+msgstr "단위당 표준 시간(분)입니다."
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__name
+msgid "Step"
+msgstr "단계"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__step_ids
+#: model_terms:ir.ui.view,arch_db:mes_routing.mes_routing_view_form
+msgid "Steps"
+msgstr "단계"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__bom_id
+msgid "Target BoM"
+msgstr "대상 자재명세서"
+
+#. module: mes_routing
+#: model_terms:ir.ui.view,arch_db:mes_routing.mes_routing_view_form
+msgid ""
+"This archives the BoM's current operations and replaces them with these "
+"steps. Continue?"
+msgstr "자재명세서의 현재 공정을 보관 처리하고 이 단계들로 교체합니다. 계속하시겠습니까?"
+
+#. module: mes_routing
+#. odoo-python
+#: code:addons/mes_routing/models/mes_routing.py:0
+msgid "This routing has no steps."
+msgstr "이 라우팅에는 단계가 없습니다."
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__total_cycle_minutes
+msgid "Total Cycle Minutes per Unit"
+msgstr "단위당 총 사이클 시간(분)"
+
+#. module: mes_routing
+#: model:ir.model.fields,field_description:mes_routing.field_mes_routing__total_setup_minutes
+msgid "Total Setup Minutes"
+msgstr "총 셋업 시간(분)"

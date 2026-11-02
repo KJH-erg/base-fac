@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_lot_trace_view_form" model="ir.ui.view">
+        <field name="name">mes.lot.trace.form</field>
+        <field name="model">mes.lot.trace</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_trace" type="object" string="Trace" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="lot_id"/>
+                            <field name="product_id"/>
+                            <field name="direction" widget="radio"/>
+                            <field name="traced" invisible="1"/>
+                        </group>
+                        <group invisible="not traced">
+                            <field name="backward_count"/>
+                            <field name="forward_count"/>
+                            <field name="forward_on_hand"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert" invisible="not traced or line_ids">
+                        No linked lots found. Only lot-tracked products on completed manufacturing orders can be traced.
+                    </div>
+                    <field name="line_ids" invisible="not traced">
+                        <list decoration-info="direction == 'backward'" decoration-warning="direction == 'forward'">
+                            <field name="direction"/>
+                            <field name="depth"/>
+                            <field name="lot_id"/>
+                            <field name="product_id"/>
+                            <field name="quantity"/>
+                            <field name="on_hand_qty"/>
+                            <field name="parent_lot_id"/>
+                            <field name="production_id"/>
+                            <field name="date"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mes_lot_trace_action" model="ir.actions.act_window">
+        <field name="name">Lot Trace</field>
+        <field name="res_model">mes.lot.trace</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_mes_lot_trace" name="Lot Trace" parent="mes_routing.menu_mes_operations"
+        action="mes_lot_trace_action" sequence="30"/>
+</odoo>

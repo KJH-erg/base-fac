@@ -157,6 +157,15 @@ docker ps
 | `grep: /etc/odoo/odoo.conf: Permission denied`, or addons missing from Odoo | Odoo must be able to read your files. Run `chmod -R a+rX addons config` once. This happens when you clone with a strict `umask` such as `077`. |
 | `localhost:8069` doesn't open from another computer | The port only listens on the server itself. Use an SSH tunnel: `ssh -L 8069:localhost:8069 user@server`, then open http://localhost:8069 on your own computer. |
 
+### Docker-in-docker
+
+If this stack runs inside another container, the default `127.0.0.1` binding is only reachable from inside that outer container. To reach Odoo from outside it:
+
+1. In `.env`, set `ODOO_BIND=0.0.0.0`, then run `docker compose up -d`.
+2. Publish the same port on the outer container, for example `-p 127.0.0.1:8069:8069` in its `docker run` command. Docker can't add this to a running container, so it has to be recreated, or set in your platform's port settings.
+
+Then open `http://localhost:8069` on the outer host, using an SSH tunnel if that host is remote.
+
 ## Not for production
 
 The passwords here are throwaway and the port only listens on localhost. Change `admin_passwd` and the database credentials, and remove `dev_mode`, before deploying this anywhere.

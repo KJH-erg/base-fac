@@ -13,7 +13,7 @@ services:
     image: odoo:20.0
     depends_on: [db]
     ports:
-      - "127.0.0.1:${ODOO_PORT:-8069}:8069"
+      - "${ODOO_BIND:-127.0.0.1}:${ODOO_PORT:-8069}:8069"
     environment:
       HOST: db
       USER: odoo

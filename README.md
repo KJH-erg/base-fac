@@ -174,9 +174,9 @@ After editing a `ko.po` file, upgrade the addon with `-u` to reload it. Labels o
 |---|---|
 | `docker: 'compose' is not a docker command` | Install the Compose plugin: `docker-compose-plugin` from Docker's own repository, or `docker-compose-v2` from Ubuntu's |
 | `permission denied` on `/var/run/docker.sock` | Run `sudo usermod -aG docker $USER`, then log out and back in |
-| `this shell can't reach it at 127.0.0.1:5433` | Docker publishes that port where its daemon runs. If your shell is in a container using another machine's Docker, Odoo can't reach the database at that address. |
+| `this shell can't reach it at 127.0.0.1:5433` | Docker publishes that port where its daemon runs. If your shell is in a container using the outer host's Docker, follow the error's suggestion: set `DB_BIND` in `.env` to the host's internal address, often the default gateway, then run the install again. Don't use `0.0.0.0`, which opens the database to anything that can reach the host. |
 | `localhost:8069` doesn't open from another computer | Use the SSH tunnel under [Start the server](#start-the-server) |
 
 ## Not for production
 
-The passwords here are throwaway and the ports only listen on localhost. Change the database credentials and remove `dev_mode` before deploying this anywhere.
+This setup is for development. Remove `dev_mode`, review who can reach the database port, and add proper backups before deploying this anywhere.

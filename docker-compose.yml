@@ -1,4 +1,5 @@
-# Local development only: the credentials below are throwaway and the port binds to localhost.
+# Local development only. POSTGRES_PASSWORD is only a first-run value:
+# scripts/install-native.sh replaces it with a generated password.
 # Odoo itself runs on the host. See scripts/odoo-native.sh.
 services:
   db:
@@ -8,7 +9,7 @@ services:
       POSTGRES_PASSWORD: odoo
       POSTGRES_DB: postgres
     ports:
-      - "127.0.0.1:${DB_PORT:-5433}:5432"
+      - "${DB_BIND:-127.0.0.1}:${DB_PORT:-5433}:5432"
     healthcheck:
       # Over TCP, because the image's first-run setup server only listens on a socket.
       test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "odoo"]

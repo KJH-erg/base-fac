@@ -25,6 +25,7 @@ docker ps >/dev/null 2>&1 || die "can't talk to Docker. Check that it's running 
 log "Starting PostgreSQL in Docker"
 "$REPO/scripts/start-postgres.sh"
 published="$(docker compose -f "$REPO/docker-compose.yml" port db 5432)"
+pg_host="${published%:*}"
 pg_port="${published##*:}"
 
 mkdir -p "$NATIVE"
@@ -52,6 +53,13 @@ echo tzdata >> "$NATIVE/requirements.txt"
 "$NATIVE/venv/bin/python" -m pip install --quiet --upgrade pip
 "$NATIVE/venv/bin/python" -m pip install --quiet -r "$NATIVE/requirements.txt"
 
+# The database may be reachable by others on a shared network, so it gets a real password.
+db_password="$(awk -F' = ' '$1 == "db_password" { print $2 }' "$CONF" 2>/dev/null || true)"
+[ -n "$db_password" ] || db_password="$("$NATIVE/venv/bin/python" -c 'import secrets; print(secrets.token_hex(16))')"
+# Sent on stdin so it doesn't show up in the host's process list.
+echo "ALTER USER odoo PASSWORD '$db_password'" \
+    | docker compose -f "$REPO/docker-compose.yml" exec -T db psql -q -U odoo -d postgres
+
 if [ ! -f "$CONF" ]; then
     log "Writing $CONF"
     admin_passwd="$("$NATIVE/venv/bin/python" -c 'import secrets; print(secrets.token_hex(16))')"
@@ -59,10 +67,10 @@ if [ ! -f "$CONF" ]; then
 [options]
 addons_path = $NATIVE/odoo/addons,$REPO/addons
 data_dir = $NATIVE/data
-db_host = 127.0.0.1
+db_host = $pg_host
 db_port = $pg_port
 db_user = odoo
-db_password = odoo
+db_password = $db_password
 admin_passwd = $admin_passwd
 ; Change to 0.0.0.0 to accept connections from other computers.
 http_interface = 127.0.0.1
@@ -71,8 +79,8 @@ dev_mode = xml
 EOF
     )
 else
-    # DB_PORT in .env may have changed since the last run.
-    sed -i "s/^db_port = .*/db_port = $pg_port/" "$CONF"
+    # DB_BIND or DB_PORT in .env may have changed since the last run.
+    sed -i -e "s/^db_host = .*/db_host = $pg_host/" -e "s/^db_port = .*/db_port = $pg_port/" "$CONF"
 fi
 
 printf '\nDone. Next, start Odoo:\n    scripts/odoo-native.sh\n'

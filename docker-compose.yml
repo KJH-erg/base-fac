@@ -1,4 +1,5 @@
-# Local development only: credentials below are throwaway and ports bind to localhost.
+# Local development only: the credentials below are throwaway and the port binds to localhost.
+# Odoo itself runs on the host. See scripts/odoo-native.sh.
 services:
   db:
     image: postgres:16
@@ -7,7 +8,6 @@ services:
       POSTGRES_PASSWORD: odoo
       POSTGRES_DB: postgres
     ports:
-      # For Odoo running outside Docker (scripts/odoo-native.sh).
       - "127.0.0.1:${DB_PORT:-5433}:5432"
     healthcheck:
       # Over TCP, because the image's first-run setup server only listens on a socket.
@@ -18,23 +18,5 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
-  odoo:
-    image: odoo:20.0
-    depends_on: [db]
-    ports:
-      - "${ODOO_BIND:-127.0.0.1}:${ODOO_PORT:-8069}:8069"
-    environment:
-      HOST: db
-      USER: odoo
-      PASSWORD: odoo
-      # Odoo's container user would leave __pycache__ files in addons/ that you can't delete on Linux.
-      PYTHONDONTWRITEBYTECODE: "1"
-    volumes:
-      # :z lets containers read these on SELinux hosts (Fedora, RHEL); ignored elsewhere.
-      - ./addons:/mnt/extra-addons:z
-      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro,z
-      - odoo-data:/var/lib/odoo
-
 volumes:
   db-data:
-  odoo-data:

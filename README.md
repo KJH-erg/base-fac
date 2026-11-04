@@ -1,28 +1,56 @@
 # Odoo 20 addon base
 
-Local Odoo 20 Community + PostgreSQL 16 in Docker. Everything you write goes in `addons/`; Odoo itself comes from the `odoo:20.0` image.
+Odoo 20 Community running directly on a Debian or Ubuntu machine, with PostgreSQL 16 in Docker. Everything you write goes in `addons/`.
 
-You need Docker with Compose v2, and it must be running: [Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS or Windows, or Docker Engine on Linux (see [Linux notes](#linux-notes)).
+You need:
 
-On Linux, you can also [run Odoo on the host](#run-odoo-on-the-host) and keep only PostgreSQL in Docker.
+- Debian or Ubuntu with Python 3.12 or newer, such as Ubuntu 24.04. The install stops on older releases such as Ubuntu 22.04.
+- `sudo` or root.
+- Docker with Compose v2. Check that it works without `sudo`:
+
+  ```bash
+  docker compose version
+  docker ps
+  ```
+
+## Install
+
+```bash
+scripts/install-native.sh
+```
+
+This follows Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), except that PostgreSQL runs in Docker. It's safe to run again.
+
+- **Odoo's source and uploaded files** go in `.native/` in this repo, which git ignores.
+- **Odoo's dependencies** are installed system-wide with `apt`, by Odoo's `setup/debinstall.sh`.
+- **PostgreSQL** runs in the `db` container, published on `127.0.0.1:5433`. If that port is taken, run `cp .env.example .env`, change `DB_PORT`, and run the install again.
+- **PDF reports** need wkhtmltopdf. The guide asks for version 0.12.6 from its own download, for correct headers and footers. The install only tries the `apt` package.
 
 ## Start the server
 
 ```bash
-docker compose up -d
+scripts/odoo-native.sh
 ```
 
-Open http://localhost:8069 and create a database. The master password is `admin` (see `config/odoo.conf`). The email and password you enter on that page become your login.
+This also starts the `db` container if needed. Press `Ctrl+C` to stop Odoo. It also stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
 
-If port 8069 is taken, for example by another Odoo project, run `cp .env.example .env`, change `ODOO_PORT`, and start again.
+Open http://localhost:8069 and create a database. The master password is `admin_passwd` in `.native/odoo.conf`, generated randomly for your install. The email and password you enter on that page become your login.
 
-To stop the server:
+**From another computer:** Odoo only listens on the server itself, so use an SSH tunnel from your computer, then open http://localhost:8069 there:
+
+```bash
+ssh -L 8069:localhost:8069 user@server
+```
+
+The tunnel needs SSH access to the machine Odoo runs on. If your shell is inside a container whose port 8069 isn't published, nothing outside can reach it: publish the port in the platform's settings, or run this on the real host.
+
+To stop PostgreSQL:
 
 ```bash
 docker compose down
 ```
 
-This keeps your data. Adding `-v` also deletes all databases and uploaded files.
+This keeps your data. Adding `-v` also deletes all databases.
 
 ## Add an addon
 
@@ -31,11 +59,8 @@ This keeps your data. Adding `-v` also deletes all databases and uploaded files.
 Every folder in `addons/` that has a `__manifest__.py` is an addon. Generate one:
 
 ```bash
-docker compose exec --user "$(id -u):$(id -g)" odoo odoo scaffold my_addon /mnt/extra-addons
-chmod -R go-w addons/my_addon
+scripts/odoo-native.sh scaffold my_addon addons
 ```
-
-The `--user` part makes the new files yours. Without it, Linux refuses with `PermissionError`, because Odoo runs as a different user inside the container. The `chmod` removes the world-write permission scaffold gives its files.
 
 Or copy `addons/example_addon`, the smallest working reference, and rename the folder.
 
@@ -56,12 +81,13 @@ Or copy `addons/example_addon`, the smallest working reference, and rename the f
 
 ### 3. Install it
 
-Replace `mydb` with your database name.
+Replace `mydb` with your database name, then restart the server.
 
 ```bash
-docker compose run --rm odoo odoo -d mydb -i my_addon --stop-after-init --no-http
-docker compose restart odoo
+scripts/odoo-native.sh -d mydb -i my_addon --stop-after-init --no-http
 ```
+
+Installing through `-i` on a new database also creates the login `admin` / `admin`, so change it if others can reach the server.
 
 To install from the browser instead, turn on developer mode (add `?debug=1` to the URL), open **Apps → Update Apps List**, then search for the addon. Remove the default `Apps` filter to see addons that aren't marked as applications.
 
@@ -70,27 +96,23 @@ To install from the browser instead, turn on developer mode (add `?debug=1` to t
 | What changed | What to do |
 |---|---|
 | XML views | Refresh the browser (`dev_mode = xml`) |
-| Python method bodies | `docker compose restart odoo` |
+| Python method bodies | Restart the server |
 | Model fields, data files, access rights, manifest | Upgrade, then restart (below) |
 | JavaScript or other assets | Refresh the browser, with an upgrade if you added a new file |
 
 ```bash
-docker compose run --rm odoo odoo -d mydb -u my_addon --stop-after-init --no-http
-docker compose restart odoo
+scripts/odoo-native.sh -d mydb -u my_addon --stop-after-init --no-http
 ```
 
 ## Other commands
 
 ```bash
 # Run one addon's tests in a throwaway database
-docker compose run --rm odoo odoo -d test_my_addon -i my_addon --test-enable --test-tags /my_addon --stop-after-init --no-http
+scripts/odoo-native.sh -d test_my_addon -i my_addon --test-enable --test-tags /my_addon --stop-after-init --no-http
 docker compose exec db dropdb -U odoo test_my_addon
 
-# Follow the server log
-docker compose logs -f odoo
-
 # Open an interactive ORM shell
-docker compose run --rm odoo odoo shell -d mydb --no-http
+scripts/odoo-native.sh shell -d mydb --no-http
 ```
 
 ## MES addons
@@ -105,22 +127,20 @@ Five addons built on Odoo's standard Manufacturing and Inventory apps. Lines are
 | `mes_lot_trace` | Traces a lot backward to its sources and forward to what it went into. | MES → Operations → Lot Trace |
 | `mes_kpi` | OEE, plan achievement, defect rate and downtime by line and period. | MES → Reporting |
 
-Install all five. Dependencies such as `mrp` come along automatically:
+Install all five, then restart the server. Dependencies such as `mrp` come along automatically:
 
 ```bash
-docker compose run --rm odoo odoo -d mydb -i mes_kpi,mes_lot_trace --stop-after-init --no-http
-docker compose restart odoo
+scripts/odoo-native.sh -d mydb -i mes_kpi,mes_lot_trace --stop-after-init --no-http
 ```
 
 Users need a Manufacturing role to see the MES menu. **User** can create and edit plans and results; **Administrator** can also edit routings and delete records.
 
 ### Korean
 
-All five addons include Korean translations in `i18n/ko.po`. They load automatically once Korean is active in the database. To activate it from the command line:
+All five addons include Korean translations in `i18n/ko.po`. They load automatically once Korean is active in the database. To activate it from the command line, then restart the server:
 
 ```bash
-docker compose run --rm odoo odoo -d mydb --load-language=ko_KR --stop-after-init --no-http
-docker compose restart odoo
+scripts/odoo-native.sh -d mydb --load-language=ko_KR --stop-after-init --no-http
 ```
 
 Then click your avatar (top right), open **My Preferences** (내 추가 설정), and choose Korean as your language.
@@ -143,80 +163,15 @@ After editing a `ko.po` file, upgrade the addon with `-u` to reload it. Labels o
 - Applying a routing to a BoM copies cycle times only, because Odoo has no setup time per operation. Setup time is still used for line load.
 - Line capacity comes from the line's working calendar (`hours_per_day`). A plan without a routing adds no load.
 
-## Run Odoo on the host
-
-On Debian or Ubuntu, you can run Odoo directly on the machine and keep PostgreSQL in Docker. You need `sudo` or root, and Docker with Compose v2.
-
-Stop the Docker stack first if it's running, because both use port 8069. This keeps your data.
-
-```bash
-docker compose down
-```
-
-Then install:
-
-```bash
-scripts/install-native.sh
-```
-
-This follows Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), except that PostgreSQL runs in Docker. It's safe to run again. Odoo's source and uploaded files go in `.native/` in this repo, which git ignores. Odoo's `setup/debinstall.sh` installs its Python packages and the PostgreSQL client tools system-wide with `apt`. The install also starts the `db` container, published on `127.0.0.1:5433`. If that port is taken, set `DB_PORT` in `.env` and run the install again.
-
-- **Python:** Odoo 20 needs 3.12+, so this needs a release such as Ubuntu 24.04. The install stops on older ones such as Ubuntu 22.04.
-- **Existing databases:** this is the same PostgreSQL the Docker setup uses, so your databases are still there. Files uploaded to them stay in Docker's `odoo-data` volume and aren't copied across.
-- **PDF reports:** the guide asks for wkhtmltopdf 0.12.6 from its own download, for correct headers and footers. The install only tries the `apt` package.
-
-Then start Odoo. It starts the `db` container if needed. Odoo stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
-
-```bash
-scripts/odoo-native.sh
-```
-
-Open http://localhost:8069 and create a database. The master password is `admin_passwd` in `.native/odoo.conf`, generated randomly for your install.
-
-**From another computer:** Odoo only listens on the server itself, so use an SSH tunnel from your computer, then open http://localhost:8069 there:
-
-```bash
-ssh -L 8069:localhost:8069 user@server
-```
-
-The tunnel needs SSH access to the machine Odoo runs on. If your shell is inside a container whose port 8069 isn't published, nothing outside can reach it: publish the port in the platform's settings, or run this on the real host.
-
-**Commands:** `scripts/odoo-native.sh` takes the same arguments as `odoo` in the Docker commands in this README:
-
-```bash
-scripts/odoo-native.sh scaffold my_addon addons
-scripts/odoo-native.sh -d mydb -i mes_kpi,mes_lot_trace --stop-after-init --no-http
-scripts/odoo-native.sh -d mydb -u my_addon --stop-after-init --no-http
-scripts/odoo-native.sh shell -d mydb --no-http
-```
-
-After `-i` or `-u`, restart the server. Installing through `-i` on a new database also creates the login `admin` / `admin`, so change it if others can reach the server.
-
-## Linux notes
-
-Check that Docker works without `sudo` and that Compose v2 is installed:
-
-```bash
-docker compose version
-docker ps
-```
+## Troubleshooting
 
 | Problem | Fix |
 |---|---|
 | `docker: 'compose' is not a docker command` | Install the Compose plugin: `docker-compose-plugin` from Docker's own repository, or `docker-compose-v2` from Ubuntu's |
 | `permission denied` on `/var/run/docker.sock` | Run `sudo usermod -aG docker $USER`, then log out and back in |
-| `grep: /etc/odoo/odoo.conf: Permission denied`, or addons missing from Odoo | Odoo must be able to read your files. Run `chmod -R a+rX addons config` once. This happens when you clone with a strict `umask` such as `077`. |
-| `localhost:8069` doesn't open from another computer | The port only listens on the server itself. Use an SSH tunnel: `ssh -L 8069:localhost:8069 user@server`, then open http://localhost:8069 on your own computer. |
-
-### Docker-in-docker
-
-If this stack runs inside another container, the default `127.0.0.1` binding is only reachable from inside that outer container. To reach Odoo from outside it:
-
-1. In `.env`, set `ODOO_BIND=0.0.0.0`, then run `docker compose up -d`.
-2. Publish the same port on the outer container, for example `-p 127.0.0.1:8069:8069` in its `docker run` command. Docker can't add this to a running container, so it has to be recreated, or set in your platform's port settings.
-
-Then open `http://localhost:8069` on the outer host, using an SSH tunnel if that host is remote.
+| `this shell can't reach it at 127.0.0.1:5433` | Docker publishes that port where its daemon runs. If your shell is in a container using another machine's Docker, Odoo can't reach the database at that address. |
+| `localhost:8069` doesn't open from another computer | Use the SSH tunnel under [Start the server](#start-the-server) |
 
 ## Not for production
 
-The passwords here are throwaway and the port only listens on localhost. Change `admin_passwd` and the database credentials, and remove `dev_mode`, before deploying this anywhere.
+The passwords here are throwaway and the ports only listen on localhost. Change the database credentials and remove `dev_mode` before deploying this anywhere.

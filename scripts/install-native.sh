@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Installs Odoo 20 directly on a Debian or Ubuntu host, with PostgreSQL in Docker.
-# Follows https://www.odoo.com/documentation/20.0/administration/on_premise/source.html
-# Odoo's source goes in .native/ in this repo; its dependencies are installed system-wide
-# with Odoo's own setup/debinstall.sh. Safe to run again.
+# Installs Odoo 20 on a Linux host without root, with PostgreSQL in Docker.
+# Follows the pip route of https://www.odoo.com/documentation/20.0/administration/on_premise/source.html
+# Odoo's source, Python and its packages all go in .native/ in this repo. Safe to run again.
 set -euo pipefail
 
 ODOO_BRANCH=20.0
+PYTHON_VERSION=3.12
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NATIVE="$REPO/.native"
@@ -14,26 +14,13 @@ CONF="$NATIVE/odoo.conf"
 log() { printf '\n==> %s\n' "$*"; }
 die() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 
-command -v apt-get >/dev/null || die "this script supports Debian and Ubuntu only."
+for tool in curl git; do
+    command -v "$tool" >/dev/null || die "$tool is required. Ask your administrator to install it."
+done
 docker compose version >/dev/null 2>&1 || die "Docker with Compose v2 is required for PostgreSQL."
 docker ps >/dev/null 2>&1 || die "can't talk to Docker. Check that it's running and that your user can use it."
-
-if [ "$(id -u)" -eq 0 ]; then
-    as_root() { "$@"; }
-else
-    command -v sudo >/dev/null || die "run this as root, or install sudo."
-    as_root() { sudo "$@"; }
-fi
-export DEBIAN_FRONTEND=noninteractive
-
-log "Installing system packages"
-as_root -E apt-get update -qq
-as_root -E apt-get install -y -qq --no-install-recommends ca-certificates git openssl python3 tzdata >/dev/null
-python3 -c 'import sys; sys.exit(sys.version_info[:2] < (3, 12))' \
-    || die "Odoo 20 needs Python 3.12 or newer, for example on Ubuntu 24.04 or Debian 13."
-# Only needed for PDF reports, and not packaged on every release.
-as_root -E apt-get install -y -qq --no-install-recommends wkhtmltopdf >/dev/null 2>&1 \
-    || echo "Note: wkhtmltopdf is not available from apt, so PDF reports won't work."
+# Some of Odoo's pinned packages only come prebuilt for x86_64.
+[ "$(uname -m)" = x86_64 ] || command -v cc >/dev/null || die "on $(uname -m), a C compiler and python3-dev are required."
 
 log "Starting PostgreSQL in Docker"
 "$REPO/scripts/start-postgres.sh"
@@ -49,11 +36,25 @@ else
     git clone --quiet --depth 1 --branch "$ODOO_BRANCH" --single-branch https://github.com/odoo/odoo.git "$NATIVE/odoo"
 fi
 
-log "Installing Odoo's dependencies"
-as_root -E "$NATIVE/odoo/setup/debinstall.sh" -q >/dev/null
+log "Creating the Python environment"
+if [ ! -x "$NATIVE/venv/bin/python" ]; then
+    # Doesn't rely on the system's Python, which may be too old or missing venv support.
+    curl -fsSL https://astral.sh/uv/install.sh \
+        | env UV_INSTALL_DIR="$NATIVE/uv" UV_NO_MODIFY_PATH=1 sh >/dev/null
+    UV_PYTHON_INSTALL_DIR="$NATIVE/python" "$NATIVE/uv/uv" venv --quiet --seed --python "$PYTHON_VERSION" "$NATIVE/venv"
+fi
+
+log "Installing Odoo's Python packages"
+# Without root there are no build libraries, so use the prebuilt psycopg2 and drop the LDAP
+# client, which only auth_ldap needs. tzdata covers hosts without system time zone data.
+sed -e 's/^psycopg2==/psycopg2-binary==/' -e '/^python-ldap==/d' "$NATIVE/odoo/requirements.txt" > "$NATIVE/requirements.txt"
+echo tzdata >> "$NATIVE/requirements.txt"
+"$NATIVE/venv/bin/python" -m pip install --quiet --upgrade pip
+"$NATIVE/venv/bin/python" -m pip install --quiet -r "$NATIVE/requirements.txt"
 
 if [ ! -f "$CONF" ]; then
     log "Writing $CONF"
+    admin_passwd="$("$NATIVE/venv/bin/python" -c 'import secrets; print(secrets.token_hex(16))')"
     (umask 077; cat > "$CONF" <<EOF
 [options]
 addons_path = $NATIVE/odoo/addons,$REPO/addons
@@ -62,7 +63,7 @@ db_host = 127.0.0.1
 db_port = $pg_port
 db_user = odoo
 db_password = odoo
-admin_passwd = $(openssl rand -hex 16)
+admin_passwd = $admin_passwd
 ; Change to 0.0.0.0 to accept connections from other computers.
 http_interface = 127.0.0.1
 http_port = 8069

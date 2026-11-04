@@ -1,17 +1,13 @@
 # Odoo 20 addon base
 
-Odoo 20 Community running directly on a Debian or Ubuntu machine, with PostgreSQL 16 in Docker. Everything you write goes in `addons/`.
+Odoo 20 Community running directly on a Linux machine, with PostgreSQL 16 in Docker. Everything you write goes in `addons/`. You don't need `sudo` or root.
 
-You need:
+You need `git`, `curl`, and Docker with Compose v2. Check that Docker works for your user:
 
-- Debian or Ubuntu with Python 3.12 or newer, such as Ubuntu 24.04. The install stops on older releases such as Ubuntu 22.04.
-- `sudo` or root.
-- Docker with Compose v2. Check that it works without `sudo`:
-
-  ```bash
-  docker compose version
-  docker ps
-  ```
+```bash
+docker compose version
+docker ps
+```
 
 ## Install
 
@@ -19,12 +15,21 @@ You need:
 scripts/install-native.sh
 ```
 
-This follows Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), except that PostgreSQL runs in Docker. It's safe to run again.
+This follows the pip route of Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), except that PostgreSQL runs in Docker. It's safe to run again.
 
-- **Odoo's source and uploaded files** go in `.native/` in this repo, which git ignores.
-- **Odoo's dependencies** are installed system-wide with `apt`, by Odoo's `setup/debinstall.sh`.
+- **Odoo's source, Python 3.12, its packages and uploaded files** all go in `.native/` in this repo, which git ignores. Nothing is installed system-wide.
 - **PostgreSQL** runs in the `db` container, published on `127.0.0.1:5433`. If that port is taken, run `cp .env.example .env`, change `DB_PORT`, and run the install again.
-- **PDF reports** need wkhtmltopdf. The guide asks for version 0.12.6 from its own download, for correct headers and footers. The install only tries the `apt` package.
+
+Installing without root leaves out a few things:
+
+- **PDF reports:** these need wkhtmltopdf, which isn't installed. Ask your administrator for version 0.12.6 if you need them.
+- **Backups:** the database manager's backup and restore need PostgreSQL's client tools on the host. Use this instead, which saves the database but not uploaded files in `.native/data`:
+
+  ```bash
+  docker compose exec -T db pg_dump -U odoo mydb > mydb.sql
+  ```
+
+- **LDAP login:** the `auth_ldap` addon won't work, because its Python package needs system libraries.
 
 ## Start the server
 

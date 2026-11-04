@@ -4,6 +4,8 @@ Local Odoo 20 Community + PostgreSQL 16 in Docker. Everything you write goes in 
 
 You need Docker with Compose v2, and it must be running: [Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS or Windows, or Docker Engine on Linux (see [Linux notes](#linux-notes)).
 
+On Linux, you can also [run Odoo on the host](#run-odoo-on-the-host) and keep only PostgreSQL in Docker.
+
 ## Start the server
 
 ```bash
@@ -140,6 +142,55 @@ After editing a `ko.po` file, upgrade the addon with `-u` to reload it. Labels o
 - Lot trace follows completed manufacturing orders only. A component without lot tracking ends the chain, and enabling lot tracking is a per-product setting in Odoo.
 - Applying a routing to a BoM copies cycle times only, because Odoo has no setup time per operation. Setup time is still used for line load.
 - Line capacity comes from the line's working calendar (`hours_per_day`). A plan without a routing adds no load.
+
+## Run Odoo on the host
+
+On Debian or Ubuntu, you can run Odoo directly on the machine and keep PostgreSQL in Docker. You need `sudo` or root, and Docker with Compose v2.
+
+Stop the Docker stack first if it's running, because both use port 8069. This keeps your data.
+
+```bash
+docker compose down
+```
+
+Then install:
+
+```bash
+scripts/install-native.sh
+```
+
+This takes about 5 minutes and is safe to run again. Odoo, its Python packages and uploaded files go in `.native/` in this repo, which git ignores. It also uses `apt` to install build libraries and the PostgreSQL client tools, and starts the `db` container, published on `127.0.0.1:5433`. If that port is taken, set `DB_PORT` in `.env` and run the install again.
+
+- **Python:** Odoo 20 needs 3.12+. On older releases such as Ubuntu 22.04, Python 3.12 is downloaded into `.native/`, leaving the system's Python alone.
+- **Existing databases:** this is the same PostgreSQL the Docker setup uses, so your databases are still there. Files uploaded to them stay in Docker's `odoo-data` volume and aren't copied across.
+- **Backups:** the database manager's backup uses the host's `pg_dump`, which must be version 16 or newer. Ubuntu 22.04's isn't, so use `docker compose exec db pg_dump -U odoo mydb` there.
+
+Then start Odoo. It starts the `db` container if needed. Odoo stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
+
+```bash
+scripts/odoo-native.sh
+```
+
+Open http://localhost:8069 and create a database. The master password is `admin_passwd` in `.native/odoo.conf`, generated randomly for your install.
+
+**From another computer:** Odoo only listens on the server itself, so use an SSH tunnel from your computer, then open http://localhost:8069 there:
+
+```bash
+ssh -L 8069:localhost:8069 user@server
+```
+
+The tunnel needs SSH access to the machine Odoo runs on. If your shell is inside a container whose port 8069 isn't published, nothing outside can reach it: publish the port in the platform's settings, or run this on the real host.
+
+**Commands:** `scripts/odoo-native.sh` takes the same arguments as `odoo` in the Docker commands in this README:
+
+```bash
+scripts/odoo-native.sh scaffold my_addon addons
+scripts/odoo-native.sh -d mydb -i mes_kpi,mes_lot_trace --stop-after-init --no-http
+scripts/odoo-native.sh -d mydb -u my_addon --stop-after-init --no-http
+scripts/odoo-native.sh shell -d mydb --no-http
+```
+
+After `-i` or `-u`, restart the server. Installing through `-i` on a new database also creates the login `admin` / `admin`, so change it if others can reach the server.
 
 ## Linux notes
 

@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.native/
 .env
 .DS_Store
 .idea/

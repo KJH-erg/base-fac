@@ -6,6 +6,15 @@ services:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoo
       POSTGRES_DB: postgres
+    ports:
+      # For Odoo running outside Docker (scripts/odoo-native.sh).
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+    healthcheck:
+      # Over TCP, because the image's first-run setup server only listens on a socket.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "odoo"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
     volumes:
       - db-data:/var/lib/postgresql/data
 

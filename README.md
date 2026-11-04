@@ -2,7 +2,7 @@
 
 Local Odoo 20 Community + PostgreSQL 16 in Docker. Everything you write goes in `addons/`; Odoo itself comes from the `odoo:20.0` image.
 
-You need [Docker Desktop](https://www.docker.com/products/docker-desktop/), and it must be running.
+You need Docker with Compose v2, and it must be running: [Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS or Windows, or Docker Engine on Linux (see [Linux notes](#linux-notes)).
 
 ## Start the server
 
@@ -29,8 +29,11 @@ This keeps your data. Adding `-v` also deletes all databases and uploaded files.
 Every folder in `addons/` that has a `__manifest__.py` is an addon. Generate one:
 
 ```bash
-docker compose exec odoo odoo scaffold my_addon /mnt/extra-addons
+docker compose exec --user "$(id -u):$(id -g)" odoo odoo scaffold my_addon /mnt/extra-addons
+chmod -R go-w addons/my_addon
 ```
+
+The `--user` part makes the new files yours. Without it, Linux refuses with `PermissionError`, because Odoo runs as a different user inside the container. The `chmod` removes the world-write permission scaffold gives its files.
 
 Or copy `addons/example_addon`, the smallest working reference, and rename the folder.
 
@@ -137,6 +140,22 @@ After editing a `ko.po` file, upgrade the addon with `-u` to reload it. Labels o
 - Lot trace follows completed manufacturing orders only. A component without lot tracking ends the chain, and enabling lot tracking is a per-product setting in Odoo.
 - Applying a routing to a BoM copies cycle times only, because Odoo has no setup time per operation. Setup time is still used for line load.
 - Line capacity comes from the line's working calendar (`hours_per_day`). A plan without a routing adds no load.
+
+## Linux notes
+
+Check that Docker works without `sudo` and that Compose v2 is installed:
+
+```bash
+docker compose version
+docker ps
+```
+
+| Problem | Fix |
+|---|---|
+| `docker: 'compose' is not a docker command` | Install the Compose plugin: `docker-compose-plugin` from Docker's own repository, or `docker-compose-v2` from Ubuntu's |
+| `permission denied` on `/var/run/docker.sock` | Run `sudo usermod -aG docker $USER`, then log out and back in |
+| `grep: /etc/odoo/odoo.conf: Permission denied`, or addons missing from Odoo | Odoo must be able to read your files. Run `chmod -R a+rX addons config` once. This happens when you clone with a strict `umask` such as `077`. |
+| `localhost:8069` doesn't open from another computer | The port only listens on the server itself. Use an SSH tunnel: `ssh -L 8069:localhost:8069 user@server`, then open http://localhost:8069 on your own computer. |
 
 ## Not for production
 

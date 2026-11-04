@@ -18,9 +18,12 @@ services:
       HOST: db
       USER: odoo
       PASSWORD: odoo
+      # Odoo's container user would leave __pycache__ files in addons/ that you can't delete on Linux.
+      PYTHONDONTWRITEBYTECODE: "1"
     volumes:
-      - ./addons:/mnt/extra-addons
-      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+      # :z lets containers read these on SELinux hosts (Fedora, RHEL); ignored elsewhere.
+      - ./addons:/mnt/extra-addons:z
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro,z
       - odoo-data:/var/lib/odoo
 
 volumes:

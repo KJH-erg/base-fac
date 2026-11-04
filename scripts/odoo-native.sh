@@ -10,6 +10,8 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NATIVE="$REPO/.native"
 [ -f "$NATIVE/odoo.conf" ] || { echo "Run scripts/install-native.sh first." >&2; exit 1; }
 
+# Odoo calls pg_dump and psql for database backups and restores.
+export PATH="$NATIVE/pg/bin:$PATH"
 odoo=("$NATIVE/venv/bin/python" "$NATIVE/odoo/odoo-bin")
 
 case "${1:-}" in

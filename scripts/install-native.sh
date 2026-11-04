@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Installs Odoo 20 on a Linux host without root, with PostgreSQL in Docker.
+# Installs Odoo 20 and PostgreSQL on a Linux host without root.
 # Follows the pip route of https://www.odoo.com/documentation/20.0/administration/on_premise/source.html
-# Odoo's source, Python and its packages all go in .native/ in this repo. Safe to run again.
+# Odoo's source, Python, PostgreSQL and all data go in .native/ in this repo. Safe to run again.
 set -euo pipefail
 
 ODOO_BRANCH=20.0
 PYTHON_VERSION=3.12
+POSTGRES_VERSION=16
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NATIVE="$REPO/.native"
@@ -14,19 +15,12 @@ CONF="$NATIVE/odoo.conf"
 log() { printf '\n==> %s\n' "$*"; }
 die() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 
-for tool in curl git; do
+[ "$(id -u)" -ne 0 ] || die "run this as a normal user, because PostgreSQL refuses to run as root."
+for tool in conda curl git; do
     command -v "$tool" >/dev/null || die "$tool is required. Ask your administrator to install it."
 done
-docker compose version >/dev/null 2>&1 || die "Docker with Compose v2 is required for PostgreSQL."
-docker ps >/dev/null 2>&1 || die "can't talk to Docker. Check that it's running and that your user can use it."
 # Some of Odoo's pinned packages only come prebuilt for x86_64.
 [ "$(uname -m)" = x86_64 ] || command -v cc >/dev/null || die "on $(uname -m), a C compiler and python3-dev are required."
-
-log "Starting PostgreSQL in Docker"
-"$REPO/scripts/start-postgres.sh"
-published="$(docker compose -f "$REPO/docker-compose.yml" port db 5432)"
-pg_host="${published%:*}"
-pg_port="${published##*:}"
 
 mkdir -p "$NATIVE"
 
@@ -53,12 +47,21 @@ echo tzdata >> "$NATIVE/requirements.txt"
 "$NATIVE/venv/bin/python" -m pip install --quiet --upgrade pip
 "$NATIVE/venv/bin/python" -m pip install --quiet -r "$NATIVE/requirements.txt"
 
-# The database may be reachable by others on a shared network, so it gets a real password.
-db_password="$(awk -F' = ' '$1 == "db_password" { print $2 }' "$CONF" 2>/dev/null || true)"
-[ -n "$db_password" ] || db_password="$("$NATIVE/venv/bin/python" -c 'import secrets; print(secrets.token_hex(16))')"
-# Sent on stdin so it doesn't show up in the host's process list.
-echo "ALTER USER odoo PASSWORD '$db_password'" \
-    | docker compose -f "$REPO/docker-compose.yml" exec -T db psql -q -U odoo -d postgres
+log "Setting up PostgreSQL $POSTGRES_VERSION"
+if [ ! -x "$NATIVE/pg/bin/pg_ctl" ]; then
+    conda create --quiet --yes --prefix "$NATIVE/pg" --override-channels -c conda-forge "postgresql=$POSTGRES_VERSION" >/dev/null
+fi
+if [ ! -f "$NATIVE/pgdata/PG_VERSION" ]; then
+    "$NATIVE/pg/bin/initdb" -D "$NATIVE/pgdata" -U odoo -E UTF8 --locale=C --auth-local=trust --auth-host=reject >/dev/null
+    # Unix socket only, in a folder only you can open, so nobody else on the machine can connect.
+    install -d -m 700 "$NATIVE/run"
+    cat >> "$NATIVE/pgdata/postgresql.conf" <<EOF
+listen_addresses = ''
+unix_socket_directories = '$NATIVE/run'
+unix_socket_permissions = 0700
+EOF
+fi
+"$REPO/scripts/start-postgres.sh"
 
 if [ ! -f "$CONF" ]; then
     log "Writing $CONF"
@@ -67,10 +70,8 @@ if [ ! -f "$CONF" ]; then
 [options]
 addons_path = $NATIVE/odoo/addons,$REPO/addons
 data_dir = $NATIVE/data
-db_host = $pg_host
-db_port = $pg_port
+db_host = $NATIVE/run
 db_user = odoo
-db_password = $db_password
 admin_passwd = $admin_passwd
 ; Change to 0.0.0.0 to accept connections from other computers.
 http_interface = 127.0.0.1
@@ -78,9 +79,6 @@ http_port = 8069
 dev_mode = xml
 EOF
     )
-else
-    # DB_BIND or DB_PORT in .env may have changed since the last run.
-    sed -i -e "s/^db_host = .*/db_host = $pg_host/" -e "s/^db_port = .*/db_port = $pg_port/" "$CONF"
 fi
 
 printf '\nDone. Next, start Odoo:\n    scripts/odoo-native.sh\n'

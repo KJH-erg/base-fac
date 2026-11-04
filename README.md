@@ -1,13 +1,8 @@
 # Odoo 20 addon base
 
-Odoo 20 Community running directly on a Linux machine, with PostgreSQL 16 in Docker. Everything you write goes in `addons/`. You don't need `sudo` or root.
+Odoo 20 Community and PostgreSQL 16 running directly on a Linux machine, without Docker. Everything you write goes in `addons/`. You don't need `sudo` or root.
 
-You need `git`, `curl`, and Docker with Compose v2. Check that Docker works for your user:
-
-```bash
-docker compose version
-docker ps
-```
+You need `git`, `curl` and `conda`.
 
 ## Install
 
@@ -15,20 +10,14 @@ docker ps
 scripts/install-native.sh
 ```
 
-This follows the pip route of Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), except that PostgreSQL runs in Docker. It's safe to run again.
+This follows the pip route of Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), with PostgreSQL from conda-forge. It's safe to run again.
 
-- **Odoo's source, Python 3.12, its packages and uploaded files** all go in `.native/` in this repo, which git ignores. Nothing is installed system-wide.
-- **PostgreSQL** runs in the `db` container, published on `127.0.0.1:5433`. If that port is taken, run `cp .env.example .env`, change `DB_PORT`, and run the install again.
+- **Everything** goes in `.native/` in this repo, which git ignores: Odoo's source, Python 3.12, its packages, PostgreSQL, your databases and uploaded files. Nothing is installed system-wide.
+- **PostgreSQL** only accepts connections through a private socket in `.native/run`, so nobody else on the machine can connect to it.
 
-Installing without root leaves out a few things:
+Installing without root leaves out two things:
 
 - **PDF reports:** these need wkhtmltopdf, which isn't installed. Ask your administrator for version 0.12.6 if you need them.
-- **Backups:** the database manager's backup and restore need PostgreSQL's client tools on the host. Use this instead, which saves the database but not uploaded files in `.native/data`:
-
-  ```bash
-  docker compose exec -T db pg_dump -U odoo mydb > mydb.sql
-  ```
-
 - **LDAP login:** the `auth_ldap` addon won't work, because its Python package needs system libraries.
 
 ## Start the server
@@ -37,7 +26,7 @@ Installing without root leaves out a few things:
 scripts/odoo-native.sh
 ```
 
-This also starts the `db` container if needed. Press `Ctrl+C` to stop Odoo. It also stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
+This also starts PostgreSQL if needed. Press `Ctrl+C` to stop Odoo. It also stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
 
 Open http://localhost:8069 and create a database. The master password is `admin_passwd` in `.native/odoo.conf`, generated randomly for your install. The email and password you enter on that page become your login.
 
@@ -49,13 +38,13 @@ ssh -L 8069:localhost:8069 user@server
 
 The tunnel needs SSH access to the machine Odoo runs on. If your shell is inside a container whose port 8069 isn't published, nothing outside can reach it: publish the port in the platform's settings, or run this on the real host.
 
-To stop PostgreSQL:
+PostgreSQL keeps running after Odoo stops. To stop it, which keeps your data:
 
 ```bash
-docker compose down
+.native/pg/bin/pg_ctl -D .native/pgdata stop
 ```
 
-This keeps your data. Adding `-v` also deletes all databases.
+To back up a database, use the database manager at http://localhost:8069/web/database/manager.
 
 ## Add an addon
 
@@ -114,7 +103,7 @@ scripts/odoo-native.sh -d mydb -u my_addon --stop-after-init --no-http
 ```bash
 # Run one addon's tests in a throwaway database
 scripts/odoo-native.sh -d test_my_addon -i my_addon --test-enable --test-tags /my_addon --stop-after-init --no-http
-docker compose exec db dropdb -U odoo test_my_addon
+.native/pg/bin/dropdb -h "$PWD/.native/run" -U odoo test_my_addon
 
 # Open an interactive ORM shell
 scripts/odoo-native.sh shell -d mydb --no-http
@@ -168,15 +157,6 @@ After editing a `ko.po` file, upgrade the addon with `-u` to reload it. Labels o
 - Applying a routing to a BoM copies cycle times only, because Odoo has no setup time per operation. Setup time is still used for line load.
 - Line capacity comes from the line's working calendar (`hours_per_day`). A plan without a routing adds no load.
 
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `docker: 'compose' is not a docker command` | Install the Compose plugin: `docker-compose-plugin` from Docker's own repository, or `docker-compose-v2` from Ubuntu's |
-| `permission denied` on `/var/run/docker.sock` | Run `sudo usermod -aG docker $USER`, then log out and back in |
-| `this shell can't reach it at 127.0.0.1:5433` | Docker publishes that port where its daemon runs. If your shell is in a container using the outer host's Docker, follow the error's suggestion: set `DB_BIND` in `.env` to the host's internal address, often the default gateway, then run the install again. Don't use `0.0.0.0`, which opens the database to anything that can reach the host. |
-| `localhost:8069` doesn't open from another computer | Use the SSH tunnel under [Start the server](#start-the-server) |
-
 ## Not for production
 
-This setup is for development. Remove `dev_mode`, review who can reach the database port, and add proper backups before deploying this anywhere.
+This setup is for development. Remove `dev_mode` and add proper backups before deploying this anywhere.

@@ -159,11 +159,11 @@ Then install:
 scripts/install-native.sh
 ```
 
-This takes about 5 minutes and is safe to run again. Odoo, its Python packages and uploaded files go in `.native/` in this repo, which git ignores. It also uses `apt` to install build libraries and the PostgreSQL client tools, and starts the `db` container, published on `127.0.0.1:5433`. If that port is taken, set `DB_PORT` in `.env` and run the install again.
+This follows Odoo's [source install guide](https://www.odoo.com/documentation/20.0/administration/on_premise/source.html), except that PostgreSQL runs in Docker. It's safe to run again. Odoo's source and uploaded files go in `.native/` in this repo, which git ignores. Odoo's `setup/debinstall.sh` installs its Python packages and the PostgreSQL client tools system-wide with `apt`. The install also starts the `db` container, published on `127.0.0.1:5433`. If that port is taken, set `DB_PORT` in `.env` and run the install again.
 
-- **Python:** Odoo 20 needs 3.12+. On older releases such as Ubuntu 22.04, Python 3.12 is downloaded into `.native/`, leaving the system's Python alone.
+- **Python:** Odoo 20 needs 3.12+, so this needs a release such as Ubuntu 24.04. The install stops on older ones such as Ubuntu 22.04.
 - **Existing databases:** this is the same PostgreSQL the Docker setup uses, so your databases are still there. Files uploaded to them stay in Docker's `odoo-data` volume and aren't copied across.
-- **Backups:** the database manager's backup uses the host's `pg_dump`, which must be version 16 or newer. Ubuntu 22.04's isn't, so use `docker compose exec db pg_dump -U odoo mydb` there.
+- **PDF reports:** the guide asks for wkhtmltopdf 0.12.6 from its own download, for correct headers and footers. The install only tries the `apt` package.
 
 Then start Odoo. It starts the `db` container if needed. Odoo stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
 

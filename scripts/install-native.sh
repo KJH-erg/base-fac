@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Installs Odoo 20 directly on a Debian or Ubuntu host, with PostgreSQL in Docker.
-# Odoo and its Python packages go in .native/ in this repo; build libraries are
-# installed system-wide with apt. Safe to run again.
+# Follows https://www.odoo.com/documentation/20.0/administration/on_premise/source.html
+# Odoo's source goes in .native/ in this repo; its dependencies are installed system-wide
+# with Odoo's own setup/debinstall.sh. Safe to run again.
 set -euo pipefail
 
 ODOO_BRANCH=20.0
@@ -27,9 +28,9 @@ export DEBIAN_FRONTEND=noninteractive
 
 log "Installing system packages"
 as_root -E apt-get update -qq
-as_root -E apt-get install -y -qq --no-install-recommends \
-    build-essential ca-certificates curl git libffi-dev libjpeg-dev libldap2-dev libpq-dev \
-    libsasl2-dev libssl-dev libxml2-dev libxslt1-dev openssl postgresql-client tzdata zlib1g-dev >/dev/null
+as_root -E apt-get install -y -qq --no-install-recommends ca-certificates git openssl python3 tzdata >/dev/null
+python3 -c 'import sys; sys.exit(sys.version_info[:2] < (3, 12))' \
+    || die "Odoo 20 needs Python 3.12 or newer, for example on Ubuntu 24.04 or Debian 13."
 # Only needed for PDF reports, and not packaged on every release.
 as_root -E apt-get install -y -qq --no-install-recommends wkhtmltopdf >/dev/null 2>&1 \
     || echo "Note: wkhtmltopdf is not available from apt, so PDF reports won't work."
@@ -45,24 +46,11 @@ log "Getting Odoo $ODOO_BRANCH source"
 if [ -d "$NATIVE/odoo/.git" ]; then
     git -C "$NATIVE/odoo" pull --quiet --ff-only
 else
-    git clone --quiet --depth 1 --branch "$ODOO_BRANCH" https://github.com/odoo/odoo.git "$NATIVE/odoo"
+    git clone --quiet --depth 1 --branch "$ODOO_BRANCH" --single-branch https://github.com/odoo/odoo.git "$NATIVE/odoo"
 fi
 
-log "Creating the Python environment"
-if [ ! -x "$NATIVE/venv/bin/python" ]; then
-    if python3 -c 'import sys; sys.exit(not (3, 12) <= sys.version_info[:2] < (3, 15))' 2>/dev/null; then
-        as_root -E apt-get install -y -qq python3-dev python3-venv >/dev/null
-        python3 -m venv "$NATIVE/venv"
-    else
-        # This release's Python is too old. Fetch 3.12 into .native/ and leave the system's alone.
-        echo "System Python is older than 3.12, so downloading Python 3.12 into .native/"
-        curl -fsSL https://astral.sh/uv/install.sh \
-            | env UV_INSTALL_DIR="$NATIVE/uv" UV_NO_MODIFY_PATH=1 sh >/dev/null
-        UV_PYTHON_INSTALL_DIR="$NATIVE/python" "$NATIVE/uv/uv" venv --quiet --seed --python 3.12 "$NATIVE/venv"
-    fi
-fi
-"$NATIVE/venv/bin/python" -m pip install --quiet --upgrade pip
-"$NATIVE/venv/bin/python" -m pip install --quiet -r "$NATIVE/odoo/requirements.txt"
+log "Installing Odoo's dependencies"
+as_root -E "$NATIVE/odoo/setup/debinstall.sh" -q >/dev/null
 
 if [ ! -f "$CONF" ]; then
     log "Writing $CONF"

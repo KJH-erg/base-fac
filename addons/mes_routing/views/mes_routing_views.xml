@@ -80,6 +80,6 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_mes_routing" name="Routings" parent="menu_mes_configuration"
-        action="mes_routing_action" sequence="10"/>
+    <menuitem id="menu_mes_routing" name="Routings" parent="menu_mes_root"
+        action="mes_routing_action" sequence="100"/>
 </odoo>

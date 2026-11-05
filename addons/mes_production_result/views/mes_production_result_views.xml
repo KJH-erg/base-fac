@@ -123,6 +123,6 @@
         <field name="view_mode">list,form,pivot,graph</field>
     </record>
 
-    <menuitem id="menu_mes_production_result" name="Production Results" parent="mes_routing.menu_mes_operations"
+    <menuitem id="menu_mes_production_result" name="Production Results" parent="mes_routing.menu_mes_root"
         action="mes_production_result_action" sequence="20"/>
 </odoo>

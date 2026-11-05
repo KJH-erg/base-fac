@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Every addon hangs its own item straight off this root, so the five of them read
+         as one flat list rather than sitting in folders a user has to open first. -->
     <menuitem id="menu_mes_root" name="MES" sequence="146"
         groups="mrp.group_mrp_user"
-        web_icon="mes_routing,static/description/icon.svg">
-        <menuitem id="menu_mes_operations" name="Operations" sequence="10"/>
-        <menuitem id="menu_mes_reporting" name="Reporting" sequence="20"/>
-        <menuitem id="menu_mes_configuration" name="Configuration" sequence="100"/>
-    </menuitem>
+        web_icon="mes_routing,static/description/icon.svg"/>
 </odoo>

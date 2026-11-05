@@ -54,11 +54,6 @@ msgid "Company"
 msgstr "회사"
 
 #. module: mes_routing
-#: model:ir.ui.menu,name:mes_routing.menu_mes_configuration
-msgid "Configuration"
-msgstr "환경설정"
-
-#. module: mes_routing
 #: model:ir.model.fields,field_description:mes_routing.field_mes_routing__create_uid
 #: model:ir.model.fields,field_description:mes_routing.field_mes_routing_step__create_uid
 msgid "Created by"
@@ -151,19 +146,9 @@ msgid "Notes"
 msgstr "메모"
 
 #. module: mes_routing
-#: model:ir.ui.menu,name:mes_routing.menu_mes_operations
-msgid "Operations"
-msgstr "운영"
-
-#. module: mes_routing
 #: model:ir.model.fields,field_description:mes_routing.field_mes_routing__product_tmpl_id
 msgid "Product"
 msgstr "품목"
-
-#. module: mes_routing
-#: model:ir.ui.menu,name:mes_routing.menu_mes_reporting
-msgid "Reporting"
-msgstr "보고"
 
 #. module: mes_routing
 #: model:ir.module.module,summary:base.module_mes_routing

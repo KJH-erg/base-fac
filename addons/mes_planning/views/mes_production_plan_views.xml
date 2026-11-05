@@ -136,6 +136,6 @@
         <field name="context">{'search_default_open': 1}</field>
     </record>
 
-    <menuitem id="menu_mes_production_plan" name="Production Plans" parent="mes_routing.menu_mes_operations"
+    <menuitem id="menu_mes_production_plan" name="Production Plans" parent="mes_routing.menu_mes_root"
         action="mes_production_plan_action" sequence="10"/>
 </odoo>

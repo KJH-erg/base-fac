@@ -52,8 +52,8 @@
         <field name="tag">mes_kpi.dashboard</field>
     </record>
 
-    <menuitem id="menu_mes_kpi_dashboard" name="KPI Dashboard" parent="mes_routing.menu_mes_reporting"
-        action="mes_kpi_dashboard_action" sequence="10"/>
-    <menuitem id="menu_mes_kpi_analysis" name="KPI Analysis" parent="mes_routing.menu_mes_reporting"
-        action="mes_kpi_report_action" sequence="20"/>
+    <menuitem id="menu_mes_kpi_dashboard" name="KPI Dashboard" parent="mes_routing.menu_mes_root"
+        action="mes_kpi_dashboard_action" sequence="40"/>
+    <menuitem id="menu_mes_kpi_analysis" name="KPI Analysis" parent="mes_routing.menu_mes_root"
+        action="mes_kpi_report_action" sequence="50"/>
 </odoo>

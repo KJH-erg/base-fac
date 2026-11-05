@@ -50,6 +50,6 @@
         <field name="target">current</field>
     </record>
 
-    <menuitem id="menu_mes_lot_trace" name="Lot Trace" parent="mes_routing.menu_mes_operations"
+    <menuitem id="menu_mes_lot_trace" name="Lot Trace" parent="mes_routing.menu_mes_root"
         action="mes_lot_trace_action" sequence="30"/>
 </odoo>

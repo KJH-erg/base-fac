@@ -79,6 +79,12 @@ http_port = 8069
 dev_mode = xml
 EOF
     )
+else
+    # An install that predates this script pointed db_host somewhere else, at Docker or at
+    # another socket, and carried a db_password that no longer applies. Without this, the
+    # install would finish and Odoo would still talk to the old database. Everything else
+    # in the file is yours to keep. | delimits, because the path contains slashes.
+    sed -i -e "s|^db_host = .*|db_host = $NATIVE/run|" -e '/^db_port = /d' -e '/^db_password = /d' "$CONF"
 fi
 
 printf '\nDone. Next, start Odoo:\n    scripts/odoo-native.sh\n'

@@ -28,6 +28,14 @@ scripts/odoo-native.sh
 
 This also starts PostgreSQL if needed. Press `Ctrl+C` to stop Odoo. It also stops when you close the terminal, so use `tmux` or `screen` to keep it running after you log out.
 
+Odoo ignores the hangup signal that `tmux kill-session` sends, so killing the session leaves the server running and holding port 8069. Stop it by PID instead:
+
+```bash
+pkill -TERM -f "odoo-bi[n] -c"
+```
+
+The brackets keep the pattern from matching the `pkill` command itself.
+
 Open http://localhost:8069 and create a database. The master password is `admin_passwd` in `.native/odoo.conf`, generated randomly for your install. The email and password you enter on that page become your login.
 
 **From another computer:** Odoo only listens on the server itself, so use an SSH tunnel from your computer, then open http://localhost:8069 there:
@@ -36,7 +44,9 @@ Open http://localhost:8069 and create a database. The master password is `admin_
 ssh -L 8069:localhost:8069 user@server
 ```
 
-The tunnel needs SSH access to the machine Odoo runs on. If your shell is inside a container whose port 8069 isn't published, nothing outside can reach it: publish the port in the platform's settings, or run this on the real host.
+The tunnel needs SSH access to the machine Odoo runs on, and `localhost` in that command means that machine, not your own. If Odoo runs inside a container, SSH to the container, not to its host: a tunnel to the host reaches the host's own port 8069, where nothing listens.
+
+If you reach the container through VS Code's Remote-SSH, its **PORTS** panel forwards 8069 over the connection you already have, with no tunnel to set up. Failing both, set `http_interface` to `0.0.0.0` in `.native/odoo.conf` and reach the container on its own address. That also opens Odoo to anything that can route to it, so set a real password first if you share the machine.
 
 PostgreSQL keeps running after Odoo stops. To stop it, which keeps your data:
 
@@ -156,6 +166,14 @@ After editing a `ko.po` file, upgrade the addon with `-u` to reload it. Labels o
 - Lot trace follows completed manufacturing orders only. A component without lot tracking ends the chain, and enabling lot tracking is a per-product setting in Odoo.
 - Applying a routing to a BoM copies cycle times only, because Odoo has no setup time per operation. Setup time is still used for line load.
 - Line capacity comes from the line's working calendar (`hours_per_day`). A plan without a routing adds no load.
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| Odoo is running but nothing answers on 8069 | It can't bind the port, usually because an older Odoo still holds it. Odoo logs this as `CRITICAL` and `Address already in use`, drops only its HTTP thread, and keeps running its cron threads, so the process looks healthy while it serves nothing. A healthy start logs `HTTP service running on …:8069`; search Odoo's output for that line and for `Address already in use`. Then stop every instance with the `pkill` above and start one. |
+| `could not translate host name ".native/run" to address` | `db_host` has to be an absolute path for PostgreSQL to read it as a socket directory. Pass the full path to `psql -h`. |
+| The install finishes but Odoo uses the wrong database | Older installs kept their own `.native/odoo.conf`. The install rewrites `db_host` in place now; if yours still points elsewhere, delete the file and install again to get a fresh one. |
 
 ## Not for production
 

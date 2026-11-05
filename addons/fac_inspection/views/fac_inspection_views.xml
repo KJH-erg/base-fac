@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fac_inspection_view_list" model="ir.ui.view">
+        <field name="name">fac.inspection.list</field>
+        <field name="model">fac.inspection</field>
+        <field name="arch" type="xml">
+            <list string="Inspections">
+                <field name="name"/>
+                <field name="inspection_date"/>
+                <field name="spec_id"/>
+                <field name="lot_ref"/>
+                <field name="workorder_ref"/>
+                <field name="measured_value"/>
+                <field name="unit"/>
+                <field name="inspector_id" widget="many2one_avatar_user"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-success="state == 'passed'"
+                       decoration-danger="state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fac_inspection_view_form" model="ir.ui.view">
+        <field name="name">fac.inspection.form</field>
+        <field name="model">fac.inspection</field>
+        <field name="arch" type="xml">
+            <form string="Inspection">
+                <header>
+                    <button name="action_judge" string="Judge" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" string="Re-measure" type="object"
+                            invisible="state != 'passed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_ncr" type="object" class="oe_stat_button" icon="warning"
+                                invisible="ncr_count == 0">
+                            <field name="ncr_count" widget="statinfo" string="NCRs"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Passed" bg_color="text-bg-success" invisible="state != 'passed'"/>
+                    <widget name="web_ribbon" title="Failed" bg_color="text-bg-danger" invisible="state != 'failed'"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Target">
+                            <field name="spec_id" readonly="state != 'draft'"/>
+                            <field name="lot_ref" readonly="state != 'draft'"/>
+                            <field name="workorder_ref" readonly="state != 'draft'" placeholder="e.g. WO/00001"/>
+                            <field name="inspector_id" widget="many2one_avatar_user" readonly="state != 'draft'"/>
+                            <field name="inspection_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Measurement">
+                            <field name="characteristic"/>
+                            <field name="lower_limit"/>
+                            <field name="upper_limit"/>
+                            <field name="unit"/>
+                            <field name="measured_value" readonly="state != 'draft'"/>
+                            <field name="judged_on" invisible="state == 'draft'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fac_inspection_view_search" model="ir.ui.view">
+        <field name="name">fac.inspection.search</field>
+        <field name="model">fac.inspection</field>
+        <field name="arch" type="xml">
+            <search string="Inspections">
+                <field name="name"/>
+                <field name="spec_id"/>
+                <field name="lot_ref"/>
+                <field name="workorder_ref"/>
+                <filter string="To Judge" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Passed" name="passed" domain="[('state', '=', 'passed')]"/>
+                <filter string="Failed" name="failed" domain="[('state', '=', 'failed')]"/>
+                <group>
+                    <filter string="Result" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Standard" name="group_spec" context="{'group_by': 'spec_id'}"/>
+                    <filter string="Work Order" name="group_workorder" context="{'group_by': 'workorder_ref'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fac_inspection_action" model="ir.actions.act_window">
+        <field name="name">Inspections</field>
+        <field name="res_model">fac.inspection</field>
+        <field name="path">fac-inspections</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_inspection_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first inspection</p>
+        </field>
+    </record>
+
+</odoo>

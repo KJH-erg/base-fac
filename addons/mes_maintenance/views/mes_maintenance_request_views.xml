@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 정비 요청: 목록 -->
+    <record id="view_mes_maintenance_request_list" model="ir.ui.view">
+        <field name="name">mes.maintenance.request.list</field>
+        <field name="model">mes.maintenance.request</field>
+        <field name="arch" type="xml">
+            <list string="정비 요청" decoration-danger="priority == 'urgent' and state not in ('done', 'rejected')"
+                  decoration-muted="state in ('done', 'rejected')">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="equipment_id"/>
+                <field name="maintenance_type"/>
+                <field name="priority"/>
+                <field name="requester_id" widget="many2one_avatar"/>
+                <field name="technician_id" widget="many2one_avatar"/>
+                <field name="total_hours" sum="합계" widget="float_time" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="total_cost" sum="합계" widget="monetary" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'request'"
+                       decoration-primary="state == 'accepted'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 정비 요청: 상세 -->
+    <record id="view_mes_maintenance_request_form" model="ir.ui.view">
+        <field name="name">mes.maintenance.request.form</field>
+        <field name="model">mes.maintenance.request</field>
+        <field name="arch" type="xml">
+            <form string="정비 요청">
+                <field name="can_edit_request" invisible="1"/>
+                <field name="can_work" invisible="1"/>
+                <field name="is_manager" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <header>
+                    <button name="action_accept" string="접수" type="object" class="btn-primary"
+                            groups="mes_maintenance.group_mes_maintenance_manager"
+                            invisible="state != 'request'"/>
+                    <button name="action_reject" string="반려" type="object"
+                            groups="mes_maintenance.group_mes_maintenance_manager"
+                            invisible="state != 'request'"/>
+                    <button name="action_start" string="작업 시작" type="object" class="btn-primary"
+                            groups="mes_maintenance.group_mes_maintenance_technician"
+                            invisible="state != 'accepted' or not can_work"/>
+                    <button name="action_done" string="완료" type="object" class="btn-primary"
+                            groups="mes_maintenance.group_mes_maintenance_technician"
+                            invisible="state != 'in_progress' or not can_work"/>
+                    <field name="state" widget="statusbar" statusbar_visible="request,accepted,in_progress,done"
+                           invisible="state == 'rejected'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="request,rejected"
+                           invisible="state != 'rejected'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="equipment_id" readonly="not can_edit_request"
+                                   options="{'no_create': True}"/>
+                            <field name="maintenance_type" readonly="not can_edit_request"/>
+                            <field name="priority" readonly="not can_edit_request"/>
+                        </group>
+                        <group>
+                            <field name="requester_id" widget="many2one_avatar"/>
+                            <field name="request_date"/>
+                            <field name="technician_id" widget="many2one_avatar"
+                                   options="{'no_create': True}"
+                                   readonly="not is_manager or state in ('done', 'rejected')"/>
+                            <field name="done_date" invisible="state != 'done'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="symptom" readonly="not can_edit_request"
+                               placeholder="설비 이상 증상을 적어 주세요."/>
+                        <field name="reject_reason" invisible="state != 'rejected'"/>
+                    </group>
+                    <notebook>
+                        <page string="작업 기록" name="work_logs">
+                            <field name="work_log_ids" readonly="not can_work">
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="user_id" widget="many2one_avatar"
+                                           options="{'no_create': True}"/>
+                                    <field name="hours" widget="float_time" sum="합계"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="비용" name="costs">
+                            <field name="cost_ids" readonly="not can_work">
+                                <list editable="bottom">
+                                    <field name="cost_type"/>
+                                    <field name="description"/>
+                                    <field name="partner_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="amount" sum="합계"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group class="oe_subtotal_footer">
+                        <field name="total_hours" widget="float_time"/>
+                        <field name="total_cost" widget="monetary"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 정비 요청: 칸반(상태별) -->
+    <record id="view_mes_maintenance_request_kanban" model="ir.ui.view">
+        <field name="name">mes.maintenance.request.kanban</field>
+        <field name="model">mes.maintenance.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0" group_create="0"
+                    group_delete="0" group_edit="0" quick_create="0" sample="1">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <field name="name" class="fw-bold"/>
+                            <field name="priority" widget="badge"
+                                   decoration-danger="priority == 'urgent'"
+                                   decoration-warning="priority == 'high'"/>
+                        </div>
+                        <field name="equipment_id"/>
+                        <field name="maintenance_type" class="text-muted"/>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <field name="request_date"/>
+                            <field name="technician_id" widget="many2one_avatar"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- 정비 요청: 검색 -->
+    <record id="view_mes_maintenance_request_search" model="ir.ui.view">
+        <field name="name">mes.maintenance.request.search</field>
+        <field name="model">mes.maintenance.request</field>
+        <field name="arch" type="xml">
+            <search string="정비 요청 검색">
+                <field name="name"/>
+                <field name="equipment_id"/>
+                <field name="requester_id"/>
+                <field name="technician_id"/>
+                <field name="symptom"/>
+                <filter string="내 요청" name="my_requests" domain="[('requester_id', '=', uid)]"/>
+                <filter string="내게 배정된 요청" name="assigned_to_me" domain="[('technician_id', '=', uid)]"/>
+                <separator/>
+                <filter string="긴급" name="urgent" domain="[('priority', '=', 'urgent')]"/>
+                <separator/>
+                <filter string="고장 정비" name="corrective" domain="[('maintenance_type', '=', 'corrective')]"/>
+                <filter string="예방 정비" name="preventive" domain="[('maintenance_type', '=', 'preventive')]"/>
+                <separator/>
+                <filter string="요청" name="state_request" domain="[('state', '=', 'request')]"/>
+                <filter string="접수" name="state_accepted" domain="[('state', '=', 'accepted')]"/>
+                <filter string="작업 중" name="state_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="완료" name="state_done" domain="[('state', '=', 'done')]"/>
+                <filter string="반려" name="state_rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter string="상태" name="group_state" context="{'group_by': 'state'}"/>
+                <filter string="설비" name="group_equipment" context="{'group_by': 'equipment_id'}"/>
+                <filter string="우선순위" name="group_priority" context="{'group_by': 'priority'}"/>
+                <filter string="배정 정비원" name="group_technician" context="{'group_by': 'technician_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mes_maintenance_request" model="ir.actions.act_window">
+        <field name="name">정비 요청</field>
+        <field name="res_model">mes.maintenance.request</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_mes_maintenance_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">정비 요청을 만드세요</p>
+            <p>설비에 이상이 있으면 증상을 적어 정비를 요청합니다.</p>
+        </field>
+    </record>
+
+    <!-- 정비 비용(외부 업체 화면에서 사용) -->
+    <record id="view_mes_maintenance_cost_list" model="ir.ui.view">
+        <field name="name">mes.maintenance.cost.list</field>
+        <field name="model">mes.maintenance.cost</field>
+        <field name="arch" type="xml">
+            <list string="정비 비용" create="0" edit="0" delete="0">
+                <field name="request_id"/>
+                <field name="equipment_id"/>
+                <field name="request_state"/>
+                <field name="cost_type"/>
+                <field name="description"/>
+                <field name="partner_id"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="amount" sum="합계"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mes_maintenance_cost_search" model="ir.ui.view">
+        <field name="name">mes.maintenance.cost.search</field>
+        <field name="model">mes.maintenance.cost</field>
+        <field name="arch" type="xml">
+            <search string="정비 비용 검색">
+                <field name="request_id"/>
+                <field name="partner_id"/>
+                <field name="equipment_id"/>
+                <filter string="업체" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                <filter string="항목" name="group_cost_type" context="{'group_by': 'cost_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mes_maintenance_cost" model="ir.actions.act_window">
+        <field name="name">정비 비용</field>
+        <field name="res_model">mes.maintenance.cost</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_mes_maintenance_cost_list"/>
+        <field name="search_view_id" ref="view_mes_maintenance_cost_search"/>
+        <field name="domain">[('request_id.state', '=', 'done')]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+</odoo>

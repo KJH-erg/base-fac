@@ -1,0 +1,10 @@
+id,name,model_id,group_id/id,operation,domain
+access_mes_energy_equipment_user,mes.energy.equipment user,mes.energy.equipment,mes_energy.group_energy_user,r,
+access_mes_energy_equipment_manager,mes.energy.equipment manager,mes.energy.equipment,mes_energy.group_energy_manager,crud,
+access_mes_energy_usage_user,mes.energy.usage user,mes.energy.usage,mes_energy.group_energy_user,crud,
+access_mes_energy_month_close_user,mes.energy.month.close user,mes.energy.month.close,mes_energy.group_energy_user,r,
+access_mes_energy_month_close_manager,mes.energy.month.close manager,mes.energy.month.close,mes_energy.group_energy_manager,crud,
+access_mes_energy_monthly_user,mes.energy.monthly user,mes.energy.monthly,mes_energy.group_energy_user,r,
+access_mes_energy_import_wizard_user,mes.energy.import.wizard user,mes.energy.import.wizard,mes_energy.group_energy_user,crud,
+access_mes_energy_import_line_user,mes.energy.import.line user,mes.energy.import.line,mes_energy.group_energy_user,crud,
+access_mes_energy_month_close_wizard_manager,mes.energy.month.close.wizard manager,mes.energy.month.close.wizard,mes_energy.group_energy_manager,crud,

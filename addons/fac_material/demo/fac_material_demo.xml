@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_material_steel_bar" model="fac.material">
+        <field name="name">Steel Bar Ø25</field>
+        <field name="code">MAT-STL-25</field>
+        <field name="category">Raw Material</field>
+        <field name="uom">m</field>
+        <field name="location">Warehouse A-01</field>
+        <field name="min_qty">50</field>
+    </record>
+
+    <record id="demo_material_bolt" model="fac.material">
+        <field name="name">Hex Bolt M8x30</field>
+        <field name="code">MAT-BLT-M8</field>
+        <field name="category">Fastener</field>
+        <field name="uom">EA</field>
+        <field name="location">Warehouse B-03</field>
+        <field name="min_qty">500</field>
+    </record>
+
+    <record id="demo_material_wire" model="fac.material">
+        <field name="name">Welding Wire 1.2mm</field>
+        <field name="code">MAT-WLD-12</field>
+        <field name="category">Consumable</field>
+        <field name="uom">kg</field>
+        <field name="location">Warehouse B-07</field>
+        <field name="min_qty">20</field>
+    </record>
+
+    <record id="demo_move_steel_in" model="fac.material.move">
+        <field name="material_id" ref="demo_material_steel_bar"/>
+        <field name="move_type">in</field>
+        <field name="quantity">120</field>
+        <field name="reference">Daehan Steel</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="demo_move_steel_out" model="fac.material.move">
+        <field name="material_id" ref="demo_material_steel_bar"/>
+        <field name="move_type">out</field>
+        <field name="quantity">40</field>
+        <field name="reference">WO/00001</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="demo_move_bolt_in" model="fac.material.move">
+        <field name="material_id" ref="demo_material_bolt"/>
+        <field name="move_type">in</field>
+        <field name="quantity">1000</field>
+        <field name="reference">Busan Fasteners</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="demo_move_bolt_out" model="fac.material.move">
+        <field name="material_id" ref="demo_material_bolt"/>
+        <field name="move_type">out</field>
+        <field name="quantity">650</field>
+        <field name="reference">WO/00002</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="demo_move_wire_in" model="fac.material.move">
+        <field name="material_id" ref="demo_material_wire"/>
+        <field name="move_type">in</field>
+        <field name="quantity">15</field>
+        <field name="reference">Daehan Steel</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <!-- Left in draft to show the confirm step. -->
+    <record id="demo_move_wire_in_draft" model="fac.material.move">
+        <field name="material_id" ref="demo_material_wire"/>
+        <field name="move_type">in</field>
+        <field name="quantity">25</field>
+        <field name="reference">Daehan Steel</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <function model="fac.material.move" name="action_confirm"
+              eval="[[ref('demo_move_steel_in'), ref('demo_move_steel_out'),
+                      ref('demo_move_bolt_in'), ref('demo_move_bolt_out'),
+                      ref('demo_move_wire_in')]]"/>
+
+</odoo>

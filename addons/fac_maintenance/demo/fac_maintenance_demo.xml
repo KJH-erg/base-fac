@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_request_robot" model="fac.maintenance.request">
+        <field name="title">Welding torch does not ignite</field>
+        <field name="equipment_ref">EQ-ROB-01</field>
+        <field name="maintenance_type">corrective</field>
+        <field name="requested_by_id" ref="base.user_admin"/>
+        <field name="problem_description">Robot stops with an arc error at the start of each seam.</field>
+    </record>
+
+    <record id="demo_request_press" model="fac.maintenance.request">
+        <field name="title">Hydraulic oil leak</field>
+        <field name="equipment_ref">EQ-PRS-01</field>
+        <field name="maintenance_type">corrective</field>
+        <field name="requested_by_id" ref="base.user_admin"/>
+        <field name="technician_id" ref="base.user_admin"/>
+        <field name="problem_description">Oil found under the main cylinder.</field>
+        <field name="cost">120</field>
+    </record>
+
+    <record id="demo_request_cnc_pm" model="fac.maintenance.request">
+        <field name="title">Quarterly spindle lubrication</field>
+        <field name="equipment_ref">EQ-CNC-01</field>
+        <field name="maintenance_type">preventive</field>
+        <field name="requested_by_id" ref="base.user_admin"/>
+        <field name="technician_id" ref="base.user_admin"/>
+        <field name="work_description">Lubricated spindle bearings, checked belt tension.</field>
+        <field name="cost">45</field>
+    </record>
+
+    <record id="demo_request_cnc_belt" model="fac.maintenance.request">
+        <field name="title">Replace worn drive belt</field>
+        <field name="equipment_ref">EQ-CNC-01</field>
+        <field name="maintenance_type">corrective</field>
+        <field name="requested_by_id" ref="base.user_admin"/>
+        <field name="technician_id" ref="base.user_admin"/>
+        <field name="work_description">Replaced drive belt and re-tensioned.</field>
+        <field name="cost">80</field>
+    </record>
+
+    <function model="fac.maintenance.request" name="action_start"
+              eval="[[ref('demo_request_press'), ref('demo_request_cnc_pm'), ref('demo_request_cnc_belt')]]"/>
+    <function model="fac.maintenance.request" name="action_done"
+              eval="[[ref('demo_request_cnc_pm'), ref('demo_request_cnc_belt')]]"/>
+
+</odoo>

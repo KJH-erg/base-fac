@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_mes_maintenance" model="ir.ui.view">
+        <field name="name">res.partner.form.mes.maintenance</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_mes_maintenance_costs" type="object" class="oe_stat_button"
+                        icon="payments" groups="mes_maintenance.group_mes_maintenance_technician">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="mes_maintenance_currency_id" invisible="1"/>
+                            <field name="mes_maintenance_cost_total" widget="monetary"
+                                   options="{'currency_field': 'mes_maintenance_currency_id'}"/>
+                        </span>
+                        <span class="o_stat_text">정비 비용 합계</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="action_mes_maintenance_partner" model="ir.actions.act_window">
+        <field name="name">외부 업체</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'default_is_company': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">외부 업체를 등록하세요</p>
+        </field>
+    </record>
+</odoo>

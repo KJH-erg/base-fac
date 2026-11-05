@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_energy_usage_search" model="ir.ui.view">
+        <field name="name">mes.energy.usage.search</field>
+        <field name="model">mes.energy.usage</field>
+        <field name="arch" type="xml">
+            <search string="일일 사용량 검색">
+                <field name="equipment_id"/>
+                <field name="month"/>
+                <field name="date"/>
+                <filter string="초과일" name="exceeded" domain="[('is_exceeded', '=', True)]"/>
+                <filter string="전력 초과" name="power_exceeded" domain="[('power_exceeded', '=', True)]"/>
+                <filter string="용수 초과" name="water_exceeded" domain="[('water_exceeded', '=', True)]"/>
+                <separator/>
+                <filter string="누락" name="missing" domain="[('is_missing', '=', True)]"/>
+                <separator/>
+                <filter string="화면 입력" name="source_manual" domain="[('input_source', '=', 'manual')]"/>
+                <filter string="파일 가져오기" name="source_import" domain="[('input_source', '=', 'import')]"/>
+                <filter string="자동 처리" name="source_auto" domain="[('input_source', '=', 'auto')]"/>
+                <separator/>
+                <filter string="날짜" name="filter_date" date="date"/>
+                <group>
+                    <filter string="설비" name="group_equipment" context="{'group_by': 'equipment_id'}"/>
+                    <filter string="월" name="group_month" context="{'group_by': 'date:month'}"/>
+                    <filter string="날짜" name="group_date" context="{'group_by': 'date:day'}"/>
+                    <filter string="입력 경로" name="group_source" context="{'group_by': 'input_source'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_mes_energy_usage_list" model="ir.ui.view">
+        <field name="name">mes.energy.usage.list</field>
+        <field name="model">mes.energy.usage</field>
+        <field name="arch" type="xml">
+            <list string="일일 사용량" decoration-danger="is_exceeded" decoration-bf="is_exceeded"
+                  decoration-warning="is_missing and not is_exceeded">
+                <field name="date"/>
+                <field name="equipment_id"/>
+                <field name="power_entered" column_invisible="1"/>
+                <field name="water_entered" column_invisible="1"/>
+                <field name="power_kwh" invisible="not power_entered" sum="전력 합계"/>
+                <field name="water_m3" invisible="not water_entered" sum="용수 합계"/>
+                <field name="power_exceeded" optional="show"/>
+                <field name="water_exceeded" optional="show"/>
+                <field name="is_exceeded" optional="show"/>
+                <field name="is_missing" optional="show"/>
+                <field name="input_source" optional="show"/>
+                <field name="month" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mes_energy_usage_form" model="ir.ui.view">
+        <field name="name">mes.energy.usage.form</field>
+        <field name="model">mes.energy.usage</field>
+        <field name="arch" type="xml">
+            <form string="일일 사용량">
+                <sheet>
+                    <div class="alert alert-danger" role="alert" invisible="not is_exceeded">
+                        기준 초과일입니다.
+                        <span invisible="not power_exceeded">전력 사용량이 기준을 넘었습니다. </span>
+                        <span invisible="not water_exceeded">용수 사용량이 기준을 넘었습니다.</span>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not is_missing">
+                        누락 기록입니다. 비어 있는 사용량을 입력하세요. 0을 기록하려면 "입력됨"을 체크하세요.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="not is_closed">
+                        마감된 달의 기록이라 고치거나 지울 수 없습니다.
+                    </div>
+                    <group>
+                        <group string="기록">
+                            <field name="equipment_id" readonly="is_closed"
+                                   domain="[('active', '=', True)]" options="{'no_create': True}"/>
+                            <field name="date" readonly="is_closed"/>
+                            <field name="month"/>
+                            <field name="input_source"/>
+                            <field name="is_closed" invisible="1"/>
+                        </group>
+                        <group string="사용량">
+                            <field name="power_kwh" readonly="is_closed"/>
+                            <field name="power_entered" readonly="is_closed"/>
+                            <field name="water_m3" readonly="is_closed"/>
+                            <field name="water_entered" readonly="is_closed"/>
+                        </group>
+                    </group>
+                    <group string="판정">
+                        <group>
+                            <field name="power_exceeded"/>
+                            <field name="water_exceeded"/>
+                        </group>
+                        <group>
+                            <field name="is_exceeded"/>
+                            <field name="is_missing"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mes_energy_usage" model="ir.actions.act_window">
+        <field name="name">일일 사용량</field>
+        <field name="res_model">mes.energy.usage</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_mes_energy_usage_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">일일 사용량을 기록하세요.</p>
+            <p>저장하면 설비 기준에 따라 초과 여부가 바로 판정되고, 초과일은 목록에 빨간색으로 표시됩니다.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fac_maintenance_request_view_list" model="ir.ui.view">
+        <field name="name">fac.maintenance.request.list</field>
+        <field name="model">fac.maintenance.request</field>
+        <field name="arch" type="xml">
+            <list string="Maintenance Requests">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="equipment_ref"/>
+                <field name="title"/>
+                <field name="maintenance_type"/>
+                <field name="technician_id" widget="many2one_avatar_user"/>
+                <field name="duration_hours" widget="float_time" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="cost" sum="Total Cost" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'requested'"
+                       decoration-info="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fac_maintenance_request_view_form" model="ir.ui.view">
+        <field name="name">fac.maintenance.request.form</field>
+        <field name="model">fac.maintenance.request</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Request">
+                <header>
+                    <button name="action_start" string="Start" type="object" class="oe_highlight"
+                            invisible="state != 'requested'"/>
+                    <button name="action_done" string="Finish" type="object" class="oe_highlight"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('requested', 'in_progress')"/>
+                    <button name="action_reopen" string="Reopen" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="requested,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <h2><field name="title" placeholder="e.g. Spindle vibration" readonly="state in ('done', 'cancelled')"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="equipment_ref" placeholder="e.g. EQ-CNC-01" readonly="state in ('done', 'cancelled')"/>
+                            <field name="maintenance_type" readonly="state in ('done', 'cancelled')"/>
+                            <field name="requested_by_id" widget="many2one_avatar_user" readonly="state != 'requested'"/>
+                            <field name="technician_id" widget="many2one_avatar_user" readonly="state in ('done', 'cancelled')"/>
+                        </group>
+                        <group>
+                            <field name="request_date" readonly="state != 'requested'"/>
+                            <field name="date_started"/>
+                            <field name="date_done"/>
+                            <field name="duration_hours" widget="float_time" invisible="state != 'done'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="cost" readonly="state in ('done', 'cancelled')"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Problem" name="problem">
+                            <field name="problem_description" readonly="state in ('done', 'cancelled')"/>
+                        </page>
+                        <page string="Work Done" name="work">
+                            <field name="work_description" readonly="state in ('done', 'cancelled')"
+                                   placeholder="What was inspected, replaced or adjusted"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fac_maintenance_request_view_search" model="ir.ui.view">
+        <field name="name">fac.maintenance.request.search</field>
+        <field name="model">fac.maintenance.request</field>
+        <field name="arch" type="xml">
+            <search string="Maintenance Requests">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="equipment_ref"/>
+                <field name="technician_id"/>
+                <filter string="To Do" name="todo" domain="[('state', 'in', ('requested', 'in_progress'))]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Corrective" name="corrective" domain="[('maintenance_type', '=', 'corrective')]"/>
+                <filter string="Preventive" name="preventive" domain="[('maintenance_type', '=', 'preventive')]"/>
+                <separator/>
+                <filter string="My Requests" name="my" domain="[('technician_id', '=', uid)]"/>
+                <group>
+                    <filter string="Equipment" name="group_equipment" context="{'group_by': 'equipment_ref'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Technician" name="group_technician" context="{'group_by': 'technician_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'maintenance_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fac_maintenance_request_action" model="ir.actions.act_window">
+        <field name="name">Maintenance Requests</field>
+        <field name="res_model">fac.maintenance.request</field>
+        <field name="path">fac-maintenance-requests</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_maintenance_request_view_search"/>
+        <field name="context">{'search_default_todo': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a maintenance request</p>
+        </field>
+    </record>
+
+    <!-- Maintenance history: finished requests grouped by equipment. -->
+    <record id="fac_maintenance_history_action" model="ir.actions.act_window">
+        <field name="name">Maintenance History</field>
+        <field name="res_model">fac.maintenance.request</field>
+        <field name="path">fac-maintenance-history</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_maintenance_request_view_search"/>
+        <field name="context">{'search_default_done': 1, 'search_default_group_equipment': 1}</field>
+    </record>
+
+</odoo>

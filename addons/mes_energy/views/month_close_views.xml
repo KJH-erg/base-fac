@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_energy_month_close_search" model="ir.ui.view">
+        <field name="name">mes.energy.month.close.search</field>
+        <field name="model">mes.energy.month.close</field>
+        <field name="arch" type="xml">
+            <search string="월 마감 검색">
+                <field name="name"/>
+                <field name="closed_by"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_mes_energy_month_close_list" model="ir.ui.view">
+        <field name="name">mes.energy.month.close.list</field>
+        <field name="model">mes.energy.month.close</field>
+        <field name="arch" type="xml">
+            <list string="월 마감" create="0" edit="0" delete="0">
+                <header>
+                    <button name="%(action_mes_energy_month_close_wizard)d" type="action" string="마감"
+                            class="btn-primary" display="always" groups="mes_energy.group_energy_manager"/>
+                </header>
+                <field name="name"/>
+                <field name="closed_at"/>
+                <field name="closed_by"/>
+                <button name="action_cancel_close" type="object" string="마감 취소"
+                        groups="mes_energy.group_energy_manager"
+                        confirm="이 달의 마감을 취소할까요? 취소하면 그 달의 기록을 다시 고칠 수 있습니다."/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mes_energy_month_close_form" model="ir.ui.view">
+        <field name="name">mes.energy.month.close.form</field>
+        <field name="model">mes.energy.month.close</field>
+        <field name="arch" type="xml">
+            <form string="월 마감" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_cancel_close" type="object" string="마감 취소"
+                            groups="mes_energy.group_energy_manager"
+                            confirm="이 달의 마감을 취소할까요? 취소하면 그 달의 기록을 다시 고칠 수 있습니다."/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="closed_at"/>
+                        <field name="closed_by"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mes_energy_month_close" model="ir.actions.act_window">
+        <field name="name">월 마감</field>
+        <field name="res_model">mes.energy.month.close</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_mes_energy_month_close_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">마감된 달이 없습니다.</p>
+            <p>[마감]을 눌러 달을 마감하세요. 누락 기록이 남은 달은 마감할 수 없습니다.</p>
+        </field>
+    </record>
+</odoo>

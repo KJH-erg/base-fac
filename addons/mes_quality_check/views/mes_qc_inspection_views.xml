@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_qc_inspection_view_list" model="ir.ui.view">
+        <field name="name">mes.qc.inspection.list</field>
+        <field name="model">mes.qc.inspection</field>
+        <field name="arch" type="xml">
+            <list string="검사" decoration-danger="result == 'fail'" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="target"/>
+                <field name="partner_id"/>
+                <field name="inspector_id"/>
+                <field name="date"/>
+                <field name="result" widget="badge"
+                       decoration-success="result == 'pass'"
+                       decoration-danger="result == 'fail'"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mes_qc_inspection_view_form" model="ir.ui.view">
+        <field name="name">mes.qc.inspection.form</field>
+        <field name="model">mes.qc.inspection</field>
+        <field name="arch" type="xml">
+            <form string="검사" duplicate="0">
+                <header>
+                    <button name="action_done" type="object" string="검사 완료" class="btn-primary"
+                            invisible="state != 'draft' or not can_edit"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <field name="can_edit" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_ncr" type="object" class="oe_stat_button"
+                                icon="error" invisible="not ncr_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">부적합 보고서</span>
+                                <field name="ncr_id" readonly="1" options="{'no_open': True}"/>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="합격" bg_color="text-bg-success"
+                            invisible="state != 'done' or result != 'pass'"/>
+                    <widget name="web_ribbon" title="불합격" bg_color="text-bg-danger"
+                            invisible="state != 'done' or result != 'fail'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="target" readonly="not can_edit" placeholder="예: LOT-2026-001 / 부품명"/>
+                            <field name="partner_id" readonly="not can_edit"/>
+                        </group>
+                        <group>
+                            <field name="inspector_id" readonly="not can_edit" options="{'no_create': True}"/>
+                            <field name="date" readonly="not can_edit"/>
+                            <field name="result" widget="badge"
+                                   decoration-success="result == 'pass'"
+                                   decoration-danger="result == 'fail'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="측정 줄" name="lines">
+                            <field name="line_ids" readonly="not can_edit">
+                                <list editable="bottom"
+                                      decoration-danger="result == 'fail'"
+                                      decoration-bf="result == 'fail'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="item_id" options="{'no_create': True}"/>
+                                    <field name="uom"/>
+                                    <field name="lower_limit"/>
+                                    <field name="upper_limit"/>
+                                    <field name="value_input" placeholder="값 입력"/>
+                                    <field name="has_value" column_invisible="1"/>
+                                    <field name="result" widget="badge"
+                                           decoration-success="result == 'pass'"
+                                           decoration-danger="result == 'fail'"/>
+                                </list>
+                                <form string="측정 줄">
+                                    <group>
+                                        <field name="item_id" options="{'no_create': True}"/>
+                                        <field name="uom"/>
+                                        <field name="lower_limit"/>
+                                        <field name="upper_limit"/>
+                                        <field name="value_input"/>
+                                        <field name="result"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mes_qc_inspection_view_search" model="ir.ui.view">
+        <field name="name">mes.qc.inspection.search</field>
+        <field name="model">mes.qc.inspection</field>
+        <field name="arch" type="xml">
+            <search string="검사 검색">
+                <field name="name"/>
+                <field name="target"/>
+                <field name="partner_id"/>
+                <field name="inspector_id"/>
+                <separator/>
+                <filter name="my_inspections" string="내 검사" domain="[('inspector_id', '=', uid)]"/>
+                <filter name="failed" string="불합격 검사" domain="[('result', '=', 'fail')]"/>
+                <filter name="passed" string="합격 검사" domain="[('result', '=', 'pass')]"/>
+                <separator/>
+                <filter name="draft" string="초안" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="검사 완료" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="filter_date" string="검사일" date="date"/>
+                <group>
+                    <filter name="group_partner" string="공급처" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_inspector" string="검사원" context="{'group_by': 'inspector_id'}"/>
+                    <filter name="group_result" string="판정" context="{'group_by': 'result'}"/>
+                    <filter name="group_state" string="상태" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="mes_qc_inspection_action" model="ir.actions.act_window">
+        <field name="name">검사</field>
+        <field name="res_model">mes.qc.inspection</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mes_qc_inspection_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">새 검사를 만드십시오.</p>
+            <p>검사 대상과 공급처를 넣고 측정 줄에 측정값을 입력하면 판정이 바로 계산됩니다.</p>
+        </field>
+    </record>
+</odoo>

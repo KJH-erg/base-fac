@@ -1,0 +1,4 @@
+id,name,model_id,group_id/id,operation,domain
+access_fac_inspection_spec_user,fac.inspection.spec user,fac.inspection.spec,base.group_user,crud,
+access_fac_inspection_user,fac.inspection user,fac.inspection,base.group_user,crud,
+access_fac_inspection_ncr_user,fac.inspection.ncr user,fac.inspection.ncr,base.group_user,crud,

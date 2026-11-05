@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_mes_work_order_mark_delayed" model="ir.cron">
+        <field name="name">작업지시: 지연 표시</field>
+        <field name="model_id" ref="model_mes_work_order"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_mark_delayed()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

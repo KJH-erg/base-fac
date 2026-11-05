@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fac_material_move_view_list" model="ir.ui.view">
+        <field name="name">fac.material.move.list</field>
+        <field name="model">fac.material.move</field>
+        <field name="arch" type="xml">
+            <list string="Moves" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="material_id"/>
+                <field name="move_type" widget="badge"
+                       decoration-success="move_type == 'in'"
+                       decoration-warning="move_type == 'out'"/>
+                <field name="quantity"/>
+                <field name="uom"/>
+                <field name="reference"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fac_material_move_view_form" model="ir.ui.view">
+        <field name="name">fac.material.move.form</field>
+        <field name="model">fac.material.move</field>
+        <field name="arch" type="xml">
+            <form string="Move">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="material_id" readonly="state != 'draft'"/>
+                            <field name="move_type" widget="radio" options="{'horizontal': true}" readonly="state != 'draft'"/>
+                            <label for="quantity"/>
+                            <div class="o_row">
+                                <field name="quantity" readonly="state != 'draft'"/> <field name="uom"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="reference" readonly="state != 'draft'"/>
+                            <field name="user_id" widget="many2one_avatar_user" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fac_material_move_view_search" model="ir.ui.view">
+        <field name="name">fac.material.move.search</field>
+        <field name="model">fac.material.move</field>
+        <field name="arch" type="xml">
+            <search string="Moves">
+                <field name="name"/>
+                <field name="material_id"/>
+                <field name="reference"/>
+                <filter string="Receipts" name="in" domain="[('move_type', '=', 'in')]"/>
+                <filter string="Issues" name="out" domain="[('move_type', '=', 'out')]"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <group>
+                    <filter string="Material" name="group_material" context="{'group_by': 'material_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'move_type'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fac_material_move_action" model="ir.actions.act_window">
+        <field name="name">Receipts &amp; Issues</field>
+        <field name="res_model">fac.material.move</field>
+        <field name="path">fac-material-moves</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_material_move_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record a receipt or an issue</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_spec_shaft_od" model="fac.inspection.spec">
+        <field name="name">Drive Shaft Outer Diameter</field>
+        <field name="code">SPEC-OD-100</field>
+        <field name="characteristic">Outer Diameter</field>
+        <field name="unit">mm</field>
+        <field name="lower_limit">24.95</field>
+        <field name="upper_limit">25.05</field>
+    </record>
+
+    <record id="demo_spec_bracket_hardness" model="fac.inspection.spec">
+        <field name="name">Bracket Hardness</field>
+        <field name="code">SPEC-HRC-20</field>
+        <field name="characteristic">Hardness</field>
+        <field name="unit">HRC</field>
+        <field name="lower_limit">38</field>
+        <field name="upper_limit">45</field>
+    </record>
+
+    <record id="demo_inspection_pass" model="fac.inspection">
+        <field name="spec_id" ref="demo_spec_shaft_od"/>
+        <field name="lot_ref">LOT-2610-01</field>
+        <field name="workorder_ref">WO/00001</field>
+        <field name="measured_value">25.01</field>
+        <field name="inspector_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="demo_inspection_fail" model="fac.inspection">
+        <field name="spec_id" ref="demo_spec_shaft_od"/>
+        <field name="lot_ref">LOT-2610-02</field>
+        <field name="workorder_ref">WO/00001</field>
+        <field name="measured_value">25.12</field>
+        <field name="inspector_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="demo_inspection_todo" model="fac.inspection">
+        <field name="spec_id" ref="demo_spec_bracket_hardness"/>
+        <field name="lot_ref">LOT-2610-07</field>
+        <field name="workorder_ref">WO/00002</field>
+        <field name="measured_value">36.5</field>
+        <field name="inspector_id" ref="base.user_admin"/>
+    </record>
+
+    <function model="fac.inspection" name="action_judge"
+              eval="[[ref('demo_inspection_pass'), ref('demo_inspection_fail')]]"/>
+
+</odoo>

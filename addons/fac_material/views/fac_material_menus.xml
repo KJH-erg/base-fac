@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="fac_material_menu_root" name="FAC Materials" sequence="240"
+              groups="base.group_user"/>
+
+    <menuitem id="fac_material_menu_material" name="Materials" sequence="10"
+              parent="fac_material_menu_root" action="fac_material_action"/>
+
+    <menuitem id="fac_material_menu_move" name="Receipts &amp; Issues" sequence="20"
+              parent="fac_material_menu_root" action="fac_material_move_action"/>
+
+    <menuitem id="fac_material_menu_low_stock" name="Low Stock" sequence="30"
+              parent="fac_material_menu_root" action="fac_material_below_min_action"/>
+
+</odoo>

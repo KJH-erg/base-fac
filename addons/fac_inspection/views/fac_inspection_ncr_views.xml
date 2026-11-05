@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fac_inspection_ncr_view_list" model="ir.ui.view">
+        <field name="name">fac.inspection.ncr.list</field>
+        <field name="model">fac.inspection.ncr</field>
+        <field name="arch" type="xml">
+            <list string="Non-Conformance Reports" create="0">
+                <field name="name"/>
+                <field name="inspection_id"/>
+                <field name="spec_id"/>
+                <field name="lot_ref"/>
+                <field name="workorder_ref"/>
+                <field name="disposition"/>
+                <field name="responsible_id" widget="many2one_avatar_user"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'open'"
+                       decoration-success="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fac_inspection_ncr_view_form" model="ir.ui.view">
+        <field name="name">fac.inspection.ncr.form</field>
+        <field name="model">fac.inspection.ncr</field>
+        <field name="arch" type="xml">
+            <form string="Non-Conformance Report" create="0">
+                <header>
+                    <button name="action_close" string="Close" type="object" class="oe_highlight"
+                            invisible="state != 'open'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="inspection_id" readonly="1"/>
+                            <field name="spec_id"/>
+                            <field name="lot_ref"/>
+                            <field name="workorder_ref"/>
+                        </group>
+                        <group>
+                            <field name="disposition" readonly="state != 'open'"/>
+                            <field name="responsible_id" widget="many2one_avatar_user" readonly="state != 'open'"/>
+                            <field name="closed_on" invisible="state != 'closed'"/>
+                        </group>
+                    </group>
+                    <field name="description" readonly="state != 'open'"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fac_inspection_ncr_view_search" model="ir.ui.view">
+        <field name="name">fac.inspection.ncr.search</field>
+        <field name="model">fac.inspection.ncr</field>
+        <field name="arch" type="xml">
+            <search string="Non-Conformance Reports">
+                <field name="name"/>
+                <field name="inspection_id"/>
+                <field name="lot_ref"/>
+                <field name="workorder_ref"/>
+                <filter string="Open" name="open" domain="[('state', '=', 'open')]"/>
+                <filter string="Closed" name="closed" domain="[('state', '=', 'closed')]"/>
+                <group>
+                    <filter string="Disposition" name="group_disposition" context="{'group_by': 'disposition'}"/>
+                    <filter string="Standard" name="group_spec" context="{'group_by': 'spec_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fac_inspection_ncr_action" model="ir.actions.act_window">
+        <field name="name">Non-Conformance Reports</field>
+        <field name="res_model">fac.inspection.ncr</field>
+        <field name="path">fac-ncr</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_inspection_ncr_view_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No open NCRs</p>
+            <p>NCRs are created automatically when an inspection fails.</p>
+        </field>
+    </record>
+
+</odoo>

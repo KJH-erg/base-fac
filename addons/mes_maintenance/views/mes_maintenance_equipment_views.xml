@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_maintenance_equipment_list" model="ir.ui.view">
+        <field name="name">mes.maintenance.equipment.list</field>
+        <field name="model">mes.maintenance.equipment</field>
+        <field name="arch" type="xml">
+            <list string="설비" decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="location"/>
+                <field name="technician_id" widget="many2one_avatar"/>
+                <field name="preventive_interval"/>
+                <field name="next_preventive_date"/>
+                <field name="maintenance_count"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="maintenance_cost" widget="monetary"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mes_maintenance_equipment_form" model="ir.ui.view">
+        <field name="name">mes.maintenance.equipment.form</field>
+        <field name="model">mes.maintenance.equipment</field>
+        <field name="arch" type="xml">
+            <form string="설비">
+                <field name="currency_id" invisible="1"/>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_requests" type="object" class="oe_stat_button"
+                                icon="build">
+                            <field name="request_count" widget="statinfo" string="정비 요청"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="사용 중지" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="설비 이름"/></h1>
+                    </div>
+                    <group>
+                        <group string="기본 정보">
+                            <field name="code"/>
+                            <field name="location"/>
+                            <field name="technician_id" widget="many2one_avatar"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="예방 정비">
+                            <field name="preventive_interval"/>
+                            <field name="next_preventive_date"
+                                   required="preventive_interval &gt; 0"
+                                   invisible="preventive_interval &lt;= 0"/>
+                        </group>
+                        <group string="정비 실적">
+                            <field name="maintenance_count"/>
+                            <field name="maintenance_cost" widget="monetary"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_mes_maintenance_equipment_search" model="ir.ui.view">
+        <field name="name">mes.maintenance.equipment.search</field>
+        <field name="model">mes.maintenance.equipment</field>
+        <field name="arch" type="xml">
+            <search string="설비 검색">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="location"/>
+                <field name="technician_id"/>
+                <filter string="예방 정비 대상" name="preventive" domain="[('preventive_interval', '&gt;', 0)]"/>
+                <separator/>
+                <filter string="사용 중지" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="위치" name="group_location" context="{'group_by': 'location'}"/>
+                <filter string="담당 정비원" name="group_technician" context="{'group_by': 'technician_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mes_maintenance_equipment" model="ir.actions.act_window">
+        <field name="name">설비</field>
+        <field name="res_model">mes.maintenance.equipment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_mes_maintenance_equipment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">설비를 등록하세요</p>
+        </field>
+    </record>
+</odoo>

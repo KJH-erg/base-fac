@@ -1,0 +1,12 @@
+id,name,model_id,group_id/id,operation,domain
+access_mes_qc_item_inspector,검사 항목: 검사원 조회,mes.qc.item,mes_quality_check.group_mes_qc_inspector,r,
+access_mes_qc_item_manager,검사 항목: 관리자 전체,mes.qc.item,mes_quality_check.group_mes_qc_manager,crud,
+access_mes_qc_inspection_inspector_read,검사: 검사원 조회,mes.qc.inspection,mes_quality_check.group_mes_qc_inspector,r,
+access_mes_qc_inspection_inspector_own,검사: 검사원 자기 검사 생성·수정·삭제,mes.qc.inspection,mes_quality_check.group_mes_qc_inspector,cud,"[('inspector_id', '=', user.id)]"
+access_mes_qc_inspection_manager,검사: 관리자 전체,mes.qc.inspection,mes_quality_check.group_mes_qc_manager,crud,
+access_mes_qc_inspection_line_inspector_read,측정 줄: 검사원 조회,mes.qc.inspection.line,mes_quality_check.group_mes_qc_inspector,r,
+access_mes_qc_inspection_line_inspector_own,측정 줄: 검사원 자기 검사의 줄,mes.qc.inspection.line,mes_quality_check.group_mes_qc_inspector,cud,"[('inspection_id.inspector_id', '=', user.id)]"
+access_mes_qc_inspection_line_manager,측정 줄: 관리자 전체,mes.qc.inspection.line,mes_quality_check.group_mes_qc_manager,crud,
+access_mes_qc_ncr_inspector_read,부적합 보고서: 검사원 조회,mes.qc.ncr,mes_quality_check.group_mes_qc_inspector,r,
+access_mes_qc_ncr_inspector_own,부적합 보고서: 담당자 수정,mes.qc.ncr,mes_quality_check.group_mes_qc_inspector,u,"[('user_id', '=', user.id)]"
+access_mes_qc_ncr_manager,부적합 보고서: 관리자 조회·수정,mes.qc.ncr,mes_quality_check.group_mes_qc_manager,ru,

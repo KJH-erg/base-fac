@@ -1,0 +1,20 @@
+{
+    'name': '품질검사',
+    'version': '20.0.1.0.0',
+    'summary': '측정값으로 합격·불합격을 판정하고 불합격이면 부적합 보고서를 생성합니다.',
+    'category': 'Supply Chain/Quality',
+    'depends': ['base'],
+    'data': [
+        'security/mes_qc_security.xml',
+        'security/ir.access.csv',
+        'data/ir_sequence_data.xml',
+        'views/mes_qc_item_views.xml',
+        'views/mes_qc_ncr_views.xml',
+        'views/mes_qc_inspection_views.xml',
+        'views/res_partner_views.xml',
+        'views/mes_qc_menus.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
+}

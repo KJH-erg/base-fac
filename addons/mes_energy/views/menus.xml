@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_mes_energy_root" name="에너지" sequence="60"
+              groups="mes_energy.group_energy_user,mes_energy.group_energy_manager"/>
+
+    <menuitem id="menu_mes_energy_records" name="기록" parent="menu_mes_energy_root" sequence="10"/>
+    <menuitem id="menu_mes_energy_usage" name="일일 사용량" parent="menu_mes_energy_records"
+              action="action_mes_energy_usage" sequence="10"/>
+    <menuitem id="menu_mes_energy_import" name="계측 파일 가져오기" parent="menu_mes_energy_records"
+              action="action_mes_energy_import_wizard" sequence="20"/>
+
+    <menuitem id="menu_mes_energy_reports" name="보고" parent="menu_mes_energy_root" sequence="20"/>
+    <menuitem id="menu_mes_energy_monthly" name="월별 보기" parent="menu_mes_energy_reports"
+              action="action_mes_energy_monthly" sequence="10"/>
+    <menuitem id="menu_mes_energy_month_close" name="월 마감" parent="menu_mes_energy_reports"
+              action="action_mes_energy_month_close" sequence="20"/>
+
+    <menuitem id="menu_mes_energy_config" name="설정" parent="menu_mes_energy_root" sequence="30"/>
+    <menuitem id="menu_mes_energy_equipment" name="설비" parent="menu_mes_energy_config"
+              action="action_mes_energy_equipment" sequence="10"/>
+</odoo>

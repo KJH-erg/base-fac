@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="fac_workorder_menu_root" name="FAC Work Orders" sequence="210"
+              groups="base.group_user"/>
+
+    <menuitem id="fac_workorder_menu_workorder" name="Work Orders" sequence="10"
+              parent="fac_workorder_menu_root" action="fac_workorder_action"/>
+
+</odoo>

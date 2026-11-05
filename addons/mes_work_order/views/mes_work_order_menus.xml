@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_mes_work_order_root"
+              name="작업지시"
+              sequence="40"
+              groups="mes_work_order.group_mes_worker"/>
+
+    <menuitem id="menu_mes_work_order"
+              name="작업지시"
+              parent="menu_mes_work_order_root"
+              action="mes_work_order_action"
+              sequence="10"/>
+
+</odoo>

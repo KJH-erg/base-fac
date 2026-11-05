@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_mes_energy_missing_records" model="ir.cron">
+        <field name="name">에너지: 전날 누락 기록 만들기</field>
+        <field name="model_id" ref="model_mes_energy_usage"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_create_missing_records()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=21, minute=0, second=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

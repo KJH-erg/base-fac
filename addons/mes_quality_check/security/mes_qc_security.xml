@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_groups_privilege_mes_qc" model="res.groups.privilege">
+        <field name="name">품질검사</field>
+        <field name="sequence">30</field>
+        <field name="category_id" ref="base.module_category_supply_chain"/>
+    </record>
+
+    <record id="group_mes_qc_inspector" model="res.groups">
+        <field name="name">검사원</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="res_groups_privilege_mes_qc"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">검사를 만들고 자기 검사의 측정값을 입력·완료하며, 자기 담당 부적합 보고서를 조치합니다.</field>
+    </record>
+
+    <record id="group_mes_qc_manager" model="res.groups">
+        <field name="name">관리자</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="res_groups_privilege_mes_qc"/>
+        <field name="implied_ids" eval="[(4, ref('group_mes_qc_inspector'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="comment">품질 관리자: 검사 항목 관리, 모든 검사·부적합 보고서 처리, 담당자 변경과 종결을 할 수 있습니다.</field>
+    </record>
+</odoo>

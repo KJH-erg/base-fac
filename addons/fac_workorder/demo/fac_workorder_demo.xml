@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_workorder_shaft" model="fac.workorder">
+        <field name="product_name">Drive Shaft A-100</field>
+        <field name="quantity">50</field>
+        <field name="equipment_ref">EQ-CNC-01</field>
+        <field name="assignee_id" ref="base.user_admin"/>
+        <field name="planned_start" eval="(DateTime.today() + relativedelta(days=1)).strftime('%Y-%m-%d 09:00:00')"/>
+    </record>
+
+    <record id="demo_workorder_bracket" model="fac.workorder">
+        <field name="product_name">Steel Bracket B-20</field>
+        <field name="quantity">200</field>
+        <field name="equipment_ref">EQ-PRS-01</field>
+        <field name="assignee_id" ref="base.user_admin"/>
+        <field name="planned_start" eval="DateTime.today().strftime('%Y-%m-%d 08:00:00')"/>
+    </record>
+
+    <record id="demo_workorder_frame" model="fac.workorder">
+        <field name="product_name">Welded Frame F-3</field>
+        <field name="quantity">10</field>
+        <field name="equipment_ref">EQ-ROB-01</field>
+        <field name="hold_reason">Welding robot is broken</field>
+        <field name="planned_start" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d 13:00:00')"/>
+    </record>
+
+    <record id="demo_workorder_flange" model="fac.workorder">
+        <field name="product_name">Flange C-7</field>
+        <field name="quantity">30</field>
+        <field name="equipment_ref">EQ-CNC-02</field>
+        <field name="assignee_id" ref="base.user_admin"/>
+        <field name="planned_start" eval="(DateTime.today() - relativedelta(days=2)).strftime('%Y-%m-%d 08:00:00')"/>
+    </record>
+
+    <function model="fac.workorder" name="action_start"
+              eval="[[ref('demo_workorder_bracket'), ref('demo_workorder_frame'), ref('demo_workorder_flange')]]"/>
+    <function model="fac.workorder" name="action_hold" eval="[[ref('demo_workorder_frame')]]"/>
+    <function model="fac.workorder" name="action_done" eval="[[ref('demo_workorder_flange')]]"/>
+
+</odoo>

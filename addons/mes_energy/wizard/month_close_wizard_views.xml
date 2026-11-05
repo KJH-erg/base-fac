@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_energy_month_close_wizard_form" model="ir.ui.view">
+        <field name="name">mes.energy.month.close.wizard.form</field>
+        <field name="model">mes.energy.month.close.wizard</field>
+        <field name="arch" type="xml">
+            <form string="월 마감">
+                <p>마감한 달의 일일 사용량은 화면 입력, 수정, 삭제, 파일 가져오기, 자동 처리로 바뀌지 않습니다.
+                    누락 기록이 남아 있으면 마감할 수 없습니다.</p>
+                <group>
+                    <field name="year" options="{'format': false}"/>
+                    <field name="month"/>
+                </group>
+                <footer>
+                    <button string="마감" name="action_close" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="취소" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mes_energy_month_close_wizard" model="ir.actions.act_window">
+        <field name="name">월 마감</field>
+        <field name="res_model">mes.energy.month.close.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_mes_energy_month_close_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

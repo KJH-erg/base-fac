@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_material_list" model="ir.ui.view">
+        <field name="name">mes.material.list</field>
+        <field name="model">mes.material</field>
+        <field name="arch" type="xml">
+            <list string="자재" decoration-danger="is_shortage" decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="uom"/>
+                <field name="qty_on_hand"/>
+                <field name="safety_qty"/>
+                <field name="is_shortage" widget="boolean"/>
+                <field name="partner_id" optional="show"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mes_material_form" model="ir.ui.view">
+        <field name="name">mes.material.form</field>
+        <field name="model">mes.material</field>
+        <field name="arch" type="xml">
+            <form string="자재">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_moves" type="object" class="oe_stat_button" icon="swap_horiz">
+                            <field name="move_count" widget="statinfo" string="입출고 내역"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="사용 중지" bg_color="text-bg-danger" invisible="active"/>
+                    <widget name="web_ribbon" title="재고 부족" bg_color="text-bg-warning" invisible="not active or not is_shortage"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="자재 이름"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="uom"/>
+                            <field name="partner_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="qty_on_hand"/>
+                            <field name="safety_qty"/>
+                            <field name="is_shortage"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_mes_material_search" model="ir.ui.view">
+        <field name="name">mes.material.search</field>
+        <field name="model">mes.material</field>
+        <field name="arch" type="xml">
+            <search string="자재 검색">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <filter string="재고 부족" name="filter_shortage" domain="[('is_shortage', '=', True)]"/>
+                <separator/>
+                <filter string="사용 중지" name="filter_inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="기본 공급처" name="groupby_partner" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mes_material" model="ir.actions.act_window">
+        <field name="name">자재</field>
+        <field name="res_model">mes.material</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_mes_material_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">자재를 등록하세요.</p>
+            <p>자재 등록은 자재 관리자만 할 수 있습니다.</p>
+        </field>
+    </record>
+</odoo>

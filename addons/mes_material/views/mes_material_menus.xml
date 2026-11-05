@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_mes_material_root" name="자재 관리" sequence="60"
+              groups="mes_material.group_mes_material_user"/>
+
+    <menuitem id="menu_mes_material_material" name="자재" parent="menu_mes_material_root"
+              action="action_mes_material" sequence="10"/>
+    <menuitem id="menu_mes_material_move" name="입출고" parent="menu_mes_material_root"
+              action="action_mes_material_move" sequence="20"/>
+    <menuitem id="menu_mes_material_bulk_receipt" name="일괄 입고" parent="menu_mes_material_root"
+              action="action_mes_material_bulk_receipt" sequence="30"/>
+    <menuitem id="menu_mes_material_alert" name="재고 부족 경고" parent="menu_mes_material_root"
+              action="action_mes_material_alert" sequence="40"/>
+    <menuitem id="menu_mes_material_partner" name="공급처" parent="menu_mes_material_root"
+              action="action_mes_material_partner" sequence="50"/>
+</odoo>

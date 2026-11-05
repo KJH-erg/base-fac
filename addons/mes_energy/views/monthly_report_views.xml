@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_energy_monthly_search" model="ir.ui.view">
+        <field name="name">mes.energy.monthly.search</field>
+        <field name="model">mes.energy.monthly</field>
+        <field name="arch" type="xml">
+            <search string="월별 보기 검색">
+                <field name="equipment_id"/>
+                <field name="month"/>
+                <filter string="초과일 있음" name="has_exceeded" domain="[('exceeded_days', '&gt;', 0)]"/>
+                <filter string="누락 있음" name="has_missing" domain="[('missing_count', '&gt;', 0)]"/>
+                <separator/>
+                <filter string="마감됨" name="closed" domain="[('is_closed', '=', True)]"/>
+                <filter string="마감 안 됨" name="not_closed" domain="[('is_closed', '=', False)]"/>
+                <separator/>
+                <filter string="기간" name="filter_month_date" date="month_date"/>
+                <group>
+                    <filter string="연월" name="group_month" context="{'group_by': 'month'}"/>
+                    <filter string="설비" name="group_equipment" context="{'group_by': 'equipment_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_mes_energy_monthly_list" model="ir.ui.view">
+        <field name="name">mes.energy.monthly.list</field>
+        <field name="model">mes.energy.monthly</field>
+        <field name="arch" type="xml">
+            <list string="월별 보기" create="0" edit="0" delete="0" decoration-danger="exceeded_days &gt; 0">
+                <field name="month"/>
+                <field name="equipment_id"/>
+                <field name="power_total" sum="전력 합계"/>
+                <field name="water_total" sum="용수 합계"/>
+                <field name="exceeded_days" sum="초과일 수"/>
+                <field name="missing_count" sum="누락 수"/>
+                <field name="record_count" optional="hide"/>
+                <field name="is_closed"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_mes_energy_monthly" model="ir.actions.act_window">
+        <field name="name">월별 보기</field>
+        <field name="res_model">mes.energy.monthly</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_mes_energy_monthly_search"/>
+        <field name="context">{'search_default_group_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">아직 일일 사용량이 없습니다.</p>
+            <p>설비별 월 합계(전력·용수)와 초과일 수를 보여 줍니다.</p>
+        </field>
+    </record>
+</odoo>

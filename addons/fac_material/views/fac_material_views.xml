@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fac_material_view_list" model="ir.ui.view">
+        <field name="name">fac.material.list</field>
+        <field name="model">fac.material</field>
+        <field name="arch" type="xml">
+            <list string="Materials" decoration-danger="is_below_min">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="location" optional="show"/>
+                <field name="qty_on_hand"/>
+                <field name="min_qty"/>
+                <field name="uom"/>
+                <field name="is_below_min" widget="boolean" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fac_material_view_form" model="ir.ui.view">
+        <field name="name">fac.material.form</field>
+        <field name="model">fac.material</field>
+        <field name="arch" type="xml">
+            <form string="Material">
+                <header>
+                    <button name="action_new_receipt" string="Receive" type="object" class="oe_highlight"
+                            invisible="not id"/>
+                    <button name="action_new_issue" string="Issue" type="object"
+                            invisible="not id"/>
+                </header>
+                <div class="alert alert-warning mb-0" role="alert" invisible="not is_below_min">
+                    Stock is below the minimum
+                    (<field name="qty_on_hand" class="oe_inline"/> / <field name="min_qty" class="oe_inline" readonly="1"/> <field name="uom" class="oe_inline" readonly="1"/>).
+                </div>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_moves" type="object" class="oe_stat_button" icon="swap_horiz">
+                            <field name="move_count" widget="statinfo" string="Moves"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Steel Bar 25mm"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category"/>
+                            <field name="location"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <label for="qty_on_hand"/>
+                            <div class="o_row">
+                                <field name="qty_on_hand" class="fw-bold"/> <field name="uom"/>
+                            </div>
+                            <field name="min_qty"/>
+                            <field name="is_below_min" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Moves" name="moves">
+                            <field name="move_ids" readonly="1">
+                                <list decoration-muted="state != 'done'">
+                                    <field name="date"/>
+                                    <field name="name"/>
+                                    <field name="move_type"/>
+                                    <field name="quantity"/>
+                                    <field name="reference"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fac_material_view_search" model="ir.ui.view">
+        <field name="name">fac.material.search</field>
+        <field name="model">fac.material</field>
+        <field name="arch" type="xml">
+            <search string="Materials">
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="category"/>
+                <field name="location"/>
+                <filter string="Below Minimum" name="below_min" domain="[('is_below_min', '=', True)]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Location" name="group_location" context="{'group_by': 'location'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fac_material_action" model="ir.actions.act_window">
+        <field name="name">Materials</field>
+        <field name="res_model">fac.material</field>
+        <field name="path">fac-materials</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_material_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first material</p>
+        </field>
+    </record>
+
+    <record id="fac_material_below_min_action" model="ir.actions.act_window">
+        <field name="name">Low Stock</field>
+        <field name="res_model">fac.material</field>
+        <field name="path">fac-materials-low-stock</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_material_view_search"/>
+        <field name="context">{'search_default_below_min': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No material is below its minimum stock</p>
+        </field>
+    </record>
+
+</odoo>

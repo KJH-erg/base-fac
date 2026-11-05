@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mes_qc_ncr_view_list" model="ir.ui.view">
+        <field name="name">mes.qc.ncr.list</field>
+        <field name="model">mes.qc.ncr</field>
+        <field name="arch" type="xml">
+            <list string="부적합 보고서" create="0" delete="0"
+                  decoration-muted="state == 'closed'" decoration-danger="state == 'open'">
+                <field name="name"/>
+                <field name="inspection_id"/>
+                <field name="target"/>
+                <field name="partner_id"/>
+                <field name="inspection_date"/>
+                <field name="user_id"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'open'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mes_qc_ncr_view_form" model="ir.ui.view">
+        <field name="name">mes.qc.ncr.form</field>
+        <field name="model">mes.qc.ncr</field>
+        <field name="arch" type="xml">
+            <form string="부적합 보고서" create="0" delete="0" duplicate="0">
+                <header>
+                    <button name="action_start" type="object" string="조치 시작" class="btn-primary"
+                            invisible="state != 'open' or not can_edit"/>
+                    <button name="action_close" type="object" string="종결" class="btn-primary"
+                            groups="mes_quality_check.group_mes_qc_manager"
+                            invisible="state != 'in_progress'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,in_progress,closed"/>
+                </header>
+                <sheet>
+                    <field name="is_manager" invisible="1"/>
+                    <field name="can_edit" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_inspection" type="object" class="oe_stat_button"
+                                icon="list_alt" string="원래 검사"/>
+                    </div>
+                    <widget name="web_ribbon" title="종결" bg_color="text-bg-success" invisible="state != 'closed'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="inspection_id" readonly="1"/>
+                            <field name="target"/>
+                            <field name="partner_id"/>
+                            <field name="inspection_date"/>
+                        </group>
+                        <group>
+                            <field name="user_id"
+                                   readonly="not is_manager or state == 'closed'"
+                                   options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <separator string="불합격 항목과 측정값 요약"/>
+                    <field name="summary" readonly="1" nolabel="1"/>
+                    <separator string="원인"/>
+                    <field name="cause" nolabel="1" readonly="not can_edit"
+                           placeholder="부적합의 원인을 적으십시오."/>
+                    <separator string="조치 내용"/>
+                    <field name="action_taken" nolabel="1" readonly="not can_edit"
+                           placeholder="취한 조치를 적으십시오."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mes_qc_ncr_view_search" model="ir.ui.view">
+        <field name="name">mes.qc.ncr.search</field>
+        <field name="model">mes.qc.ncr</field>
+        <field name="arch" type="xml">
+            <search string="부적합 보고서 검색">
+                <field name="name"/>
+                <field name="inspection_id"/>
+                <field name="target"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter name="open_reports" string="열린 부적합 보고서" domain="[('state', '!=', 'closed')]"/>
+                <filter name="my_reports" string="내 부적합 보고서" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="state_open" string="열림" domain="[('state', '=', 'open')]"/>
+                <filter name="state_in_progress" string="조치 중" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="state_closed" string="종결" domain="[('state', '=', 'closed')]"/>
+                <group>
+                    <filter name="group_state" string="상태" context="{'group_by': 'state'}"/>
+                    <filter name="group_user" string="담당자" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="mes_qc_ncr_action" model="ir.actions.act_window">
+        <field name="name">부적합 보고서</field>
+        <field name="res_model">mes.qc.ncr</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mes_qc_ncr_view_search"/>
+        <field name="context">{'search_default_open_reports': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">부적합 보고서가 없습니다.</p>
+            <p>불합격 검사를 완료하면 부적합 보고서가 자동으로 만들어집니다.</p>
+        </field>
+    </record>
+</odoo>

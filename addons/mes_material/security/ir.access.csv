@@ -1,0 +1,7 @@
+id,name,model_id,group_id/id,operation,domain
+access_mes_material_user,mes.material user,mes.material,mes_material.group_mes_material_user,r,
+access_mes_material_manager,mes.material manager,mes.material,mes_material.group_mes_material_manager,crud,
+access_mes_material_move_user,mes.material.move user,mes.material.move,mes_material.group_mes_material_user,crud,
+access_mes_material_alert_user,mes.material.alert user,mes.material.alert,mes_material.group_mes_material_user,ru,
+access_mes_material_bulk_receipt_user,mes.material.bulk.receipt user,mes.material.bulk.receipt,mes_material.group_mes_material_user,crud,
+access_mes_material_bulk_receipt_line_user,mes.material.bulk.receipt.line user,mes.material.bulk.receipt.line,mes_material.group_mes_material_user,crud,

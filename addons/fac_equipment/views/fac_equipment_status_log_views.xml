@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fac_equipment_status_log_view_list" model="ir.ui.view">
+        <field name="name">fac.equipment.status.log.list</field>
+        <field name="model">fac.equipment.status.log</field>
+        <field name="arch" type="xml">
+            <list string="Status History" create="0" edit="0">
+                <field name="changed_on"/>
+                <field name="equipment_id"/>
+                <field name="old_state"/>
+                <field name="new_state"/>
+                <field name="changed_by_id"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fac_equipment_status_log_view_form" model="ir.ui.view">
+        <field name="name">fac.equipment.status.log.form</field>
+        <field name="model">fac.equipment.status.log</field>
+        <field name="arch" type="xml">
+            <form string="Status Change" create="0" edit="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="equipment_id"/>
+                            <field name="old_state"/>
+                            <field name="new_state"/>
+                        </group>
+                        <group>
+                            <field name="changed_on"/>
+                            <field name="changed_by_id"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fac_equipment_status_log_view_search" model="ir.ui.view">
+        <field name="name">fac.equipment.status.log.search</field>
+        <field name="model">fac.equipment.status.log</field>
+        <field name="arch" type="xml">
+            <search string="Status History">
+                <field name="equipment_id"/>
+                <field name="changed_by_id"/>
+                <group>
+                    <filter string="Equipment" name="group_equipment" context="{'group_by': 'equipment_id'}"/>
+                    <filter string="New Status" name="group_new_state" context="{'group_by': 'new_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fac_equipment_status_log_action" model="ir.actions.act_window">
+        <field name="name">Status History</field>
+        <field name="res_model">fac.equipment.status.log</field>
+        <field name="path">fac-equipment-history</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="fac_equipment_status_log_view_search"/>
+    </record>
+
+</odoo>

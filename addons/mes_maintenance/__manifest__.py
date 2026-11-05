@@ -1,0 +1,21 @@
+{
+    'name': '정비',
+    'version': '20.0.1.0.0',
+    'summary': '정비 요청부터 완료까지 작업 내용, 소요 시간, 비용 기록',
+    'category': 'Supply Chain/Maintenance',
+    'depends': ['base'],
+    'data': [
+        'security/mes_maintenance_security.xml',
+        'security/ir.access.csv',
+        'data/ir_sequence_data.xml',
+        'data/ir_cron_data.xml',
+        'wizard/mes_maintenance_reject_wizard_views.xml',
+        'views/mes_maintenance_request_views.xml',
+        'views/mes_maintenance_equipment_views.xml',
+        'views/res_partner_views.xml',
+        'views/mes_maintenance_menus.xml',
+    ],
+    'application': True,
+    'installable': True,
+    'license': 'LGPL-3',
+}

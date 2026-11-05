@@ -1,0 +1,22 @@
+{
+    'name': '자재 관리',
+    'version': '20.0.1.0.0',
+    'summary': '자재 입출고와 현재고를 관리하고 재고 부족을 경고합니다.',
+    'category': 'Supply Chain',
+    'depends': ['base'],
+    'data': [
+        'security/mes_material_security.xml',
+        'security/ir.access.csv',
+        'data/ir_sequence_data.xml',
+        'data/ir_cron_data.xml',
+        'views/mes_material_views.xml',
+        'views/mes_material_move_views.xml',
+        'views/mes_material_alert_views.xml',
+        'views/res_partner_views.xml',
+        'wizard/mes_material_bulk_receipt_views.xml',
+        'views/mes_material_menus.xml',
+    ],
+    'application': True,
+    'installable': True,
+    'license': 'LGPL-3',
+}

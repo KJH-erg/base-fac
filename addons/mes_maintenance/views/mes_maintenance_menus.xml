@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_mes_maintenance_root" name="정비" sequence="60"
+              groups="mes_maintenance.group_mes_maintenance_requester"/>
+
+    <menuitem id="menu_mes_maintenance_request" name="정비 요청" sequence="10"
+              parent="menu_mes_maintenance_root" action="action_mes_maintenance_request"
+              groups="mes_maintenance.group_mes_maintenance_requester"/>
+
+    <menuitem id="menu_mes_maintenance_equipment" name="설비" sequence="20"
+              parent="menu_mes_maintenance_root" action="action_mes_maintenance_equipment"
+              groups="mes_maintenance.group_mes_maintenance_requester"/>
+
+    <menuitem id="menu_mes_maintenance_partner" name="외부 업체" sequence="30"
+              parent="menu_mes_maintenance_root" action="action_mes_maintenance_partner"
+              groups="mes_maintenance.group_mes_maintenance_technician"/>
+</odoo>

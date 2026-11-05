@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="fac_maintenance_menu_root" name="FAC Maintenance" sequence="230"
+              groups="base.group_user"/>
+
+    <menuitem id="fac_maintenance_menu_request" name="Requests" sequence="10"
+              parent="fac_maintenance_menu_root" action="fac_maintenance_request_action"/>
+
+    <menuitem id="fac_maintenance_menu_history" name="History" sequence="20"
+              parent="fac_maintenance_menu_root" action="fac_maintenance_history_action"/>
+
+</odoo>

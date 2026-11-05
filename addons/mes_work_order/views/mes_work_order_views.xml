@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 목록 -->
+    <record id="mes_work_order_view_list" model="ir.ui.view">
+        <field name="name">mes.work.order.view.list</field>
+        <field name="model">mes.work.order</field>
+        <field name="arch" type="xml">
+            <list string="작업지시" decoration-danger="is_delayed" decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="product_name" optional="show"/>
+                <field name="quantity" optional="show"/>
+                <field name="user_id" widget="many2one_avatar" optional="show"/>
+                <field name="date_start" optional="show"/>
+                <field name="date_end" optional="show"/>
+                <field name="progress" widget="progressbar" optional="show"/>
+                <field name="is_delayed" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'confirmed'"
+                       decoration-primary="state == 'in_progress'"
+                       decoration-warning="state == 'on_hold'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancel'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 상세 -->
+    <record id="mes_work_order_view_form" model="ir.ui.view">
+        <field name="name">mes.work.order.view.form</field>
+        <field name="model">mes.work.order</field>
+        <field name="arch" type="xml">
+            <form string="작업지시">
+                <field name="is_manager" invisible="1"/>
+                <field name="is_assignee" invisible="1"/>
+                <header>
+                    <button name="action_confirm" type="object" string="확정" class="btn-primary"
+                            groups="mes_work_order.group_mes_manager"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" type="object" string="착수" class="btn-primary"
+                            invisible="state != 'confirmed' or not (is_manager or is_assignee)"/>
+                    <button name="action_hold" type="object" string="보류"
+                            invisible="state != 'in_progress' or not (is_manager or is_assignee)"/>
+                    <button name="action_resume" type="object" string="재개" class="btn-primary"
+                            invisible="state != 'on_hold' or not (is_manager or is_assignee)"/>
+                    <button name="action_done" type="object" string="완료" class="btn-primary"
+                            invisible="state != 'in_progress' or not (is_manager or is_assignee)"/>
+                    <button name="action_cancel" type="object" string="취소"
+                            groups="mes_work_order.group_mes_manager"
+                            invisible="state in ('done', 'cancel')"
+                            confirm="이 작업지시를 취소하시겠습니까?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_progress,done"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="지연" bg_color="text-bg-danger"
+                            invisible="not is_delayed"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h2>
+                            <field name="title" placeholder="제목"
+                                   readonly="not is_manager or state not in ('draft', 'confirmed')"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="작업">
+                            <field name="product_name"
+                                   readonly="not is_manager or state not in ('draft', 'confirmed')"/>
+                            <field name="quantity"
+                                   readonly="not is_manager or state not in ('draft', 'confirmed')"/>
+                            <field name="user_id" widget="many2one_avatar"
+                                   options="{'no_create': True}"
+                                   readonly="not is_manager or state in ('done', 'cancel')"/>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="is_delayed"/>
+                        </group>
+                        <group string="일정">
+                            <field name="date_start"
+                                   readonly="not is_manager or state not in ('draft', 'confirmed')"/>
+                            <field name="date_end"
+                                   readonly="not is_manager or state in ('done', 'cancel')"/>
+                            <field name="date_actual_start"/>
+                            <field name="date_actual_end"/>
+                            <field name="duration_hours" widget="float_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="공정 단계" name="steps">
+                            <field name="step_ids"
+                                   readonly="not is_manager or state not in ('draft', 'confirmed')">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="is_done"/>
+                                    <field name="done_date"/>
+                                    <field name="work_order_state" column_invisible="1"/>
+                                    <button name="action_mark_done" type="object" string="완료 표시"
+                                            icon="fa-check" class="btn-link"
+                                            invisible="is_done or parent.state != 'in_progress' or not (parent.is_manager or parent.is_assignee)"/>
+                                    <button name="action_mark_undone" type="object" string="되돌리기"
+                                            icon="fa-undo" class="btn-link"
+                                            invisible="not is_done or parent.state != 'in_progress' or not (parent.is_manager or parent.is_assignee)"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="메모" name="note">
+                            <field name="note" placeholder="보류 사유 등 메모를 적습니다."
+                                   readonly="state in ('done', 'cancel') or not (is_manager or is_assignee)"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 칸반(상태별) -->
+    <record id="mes_work_order_view_kanban" model="ir.ui.view">
+        <field name="name">mes.work.order.view.kanban</field>
+        <field name="model">mes.work.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0" group_create="0"
+                    group_delete="0" group_edit="0" quick_create="0" sample="1">
+                <field name="state"/>
+                <field name="is_delayed"/>
+                <templates>
+                    <t t-name="card">
+                        <widget name="web_ribbon" title="지연" bg_color="text-bg-danger"
+                                invisible="not is_delayed"/>
+                        <div class="d-flex justify-content-between">
+                            <field name="name" class="fw-bold"/>
+                            <field name="user_id" widget="many2one_avatar"/>
+                        </div>
+                        <field name="title" class="fs-5"/>
+                        <div class="text-muted">
+                            <field name="product_name"/>
+                            <span t-if="record.quantity.raw_value"> × <field name="quantity"/></span>
+                        </div>
+                        <div class="text-muted" t-if="record.date_end.raw_value">
+                            계획 종료일: <field name="date_end"/>
+                        </div>
+                        <field name="progress" widget="progressbar"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- 검색 -->
+    <record id="mes_work_order_view_search" model="ir.ui.view">
+        <field name="name">mes.work.order.view.search</field>
+        <field name="model">mes.work.order</field>
+        <field name="arch" type="xml">
+            <search string="작업지시 검색">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="product_name"/>
+                <field name="user_id"/>
+                <filter name="my_work_orders" string="내 작업지시" domain="[('user_id', '=', uid)]"/>
+                <filter name="delayed" string="지연" domain="[('is_delayed', '=', True)]"/>
+                <separator/>
+                <filter name="state_draft" string="초안" domain="[('state', '=', 'draft')]"/>
+                <filter name="state_confirmed" string="확정" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="state_in_progress" string="진행 중" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="state_on_hold" string="보류" domain="[('state', '=', 'on_hold')]"/>
+                <filter name="state_done" string="완료" domain="[('state', '=', 'done')]"/>
+                <filter name="state_cancel" string="취소" domain="[('state', '=', 'cancel')]"/>
+                <group>
+                    <filter name="group_state" string="상태" context="{'group_by': 'state'}"/>
+                    <filter name="group_user" string="담당자" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- 동작 -->
+    <record id="mes_work_order_action" model="ir.actions.act_window">
+        <field name="name">작업지시</field>
+        <field name="res_model">mes.work.order</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="mes_work_order_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">작업지시가 없습니다</p>
+            <p>관리자가 작업지시를 만들고 확정하면 담당 작업자가 착수할 수 있습니다.</p>
+        </field>
+    </record>
+</odoo>

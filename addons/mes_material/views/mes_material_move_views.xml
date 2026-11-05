@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mes_material_move_list" model="ir.ui.view">
+        <field name="name">mes.material.move.list</field>
+        <field name="model">mes.material.move</field>
+        <field name="arch" type="xml">
+            <list string="입출고" decoration-muted="state == 'cancel'" decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="move_type"/>
+                <field name="material_id"/>
+                <field name="qty"/>
+                <field name="uom"/>
+                <field name="partner_id" optional="show"/>
+                <field name="user_id" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancel'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mes_material_move_form" model="ir.ui.view">
+        <field name="name">mes.material.move.form</field>
+        <field name="model">mes.material.move</field>
+        <field name="arch" type="xml">
+            <form string="입출고">
+                <header>
+                    <button name="action_confirm" string="확정" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="취소" type="object"
+                            invisible="state != 'draft'"
+                            confirm="이 입출고를 취소할까요?"/>
+                    <button name="action_cancel" string="취소" type="object"
+                            invisible="state != 'done'"
+                            groups="mes_material.group_mes_material_manager"
+                            confirm="확정된 입출고를 취소하면 현재고에서 그 수량의 영향이 빠집니다. 취소할까요?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="move_type" readonly="state != 'draft'"/>
+                            <field name="material_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <label for="qty"/>
+                            <div class="o_row">
+                                <field name="qty" readonly="state != 'draft'"/>
+                                <field name="uom"/>
+                            </div>
+                            <field name="partner_id" readonly="state != 'draft'"
+                                   invisible="move_type != 'in'"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="user_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group invisible="move_type != 'adjust'">
+                        <field name="reason" readonly="state != 'draft'"
+                               required="move_type == 'adjust'"
+                               placeholder="실사 차이 등 조정 사유"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_mes_material_move_search" model="ir.ui.view">
+        <field name="name">mes.material.move.search</field>
+        <field name="model">mes.material.move</field>
+        <field name="arch" type="xml">
+            <search string="입출고 검색">
+                <field name="name"/>
+                <field name="material_id"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <filter string="입고" name="filter_in" domain="[('move_type', '=', 'in')]"/>
+                <filter string="출고" name="filter_out" domain="[('move_type', '=', 'out')]"/>
+                <filter string="조정" name="filter_adjust" domain="[('move_type', '=', 'adjust')]"/>
+                <separator/>
+                <filter string="초안" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="확정" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <filter string="취소" name="filter_cancel" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter string="일자" name="filter_date" date="date"/>
+                <group>
+                    <filter string="유형" name="groupby_type" context="{'group_by': 'move_type'}"/>
+                    <filter string="자재" name="groupby_material" context="{'group_by': 'material_id'}"/>
+                    <filter string="상태" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="일자" name="groupby_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mes_material_move" model="ir.actions.act_window">
+        <field name="name">입출고</field>
+        <field name="res_model">mes.material.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_mes_material_move_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">입고·출고·조정을 만드세요.</p>
+            <p>확정된 입출고만 현재고에 반영됩니다.</p>
+        </field>
+    </record>
+</odoo>

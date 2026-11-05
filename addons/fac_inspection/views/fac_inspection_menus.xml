@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="fac_inspection_menu_root" name="FAC Quality" sequence="220"
+              groups="base.group_user"/>
+
+    <menuitem id="fac_inspection_menu_inspection" name="Inspections" sequence="10"
+              parent="fac_inspection_menu_root" action="fac_inspection_action"/>
+
+    <menuitem id="fac_inspection_menu_ncr" name="NCRs" sequence="20"
+              parent="fac_inspection_menu_root" action="fac_inspection_ncr_action"/>
+
+    <menuitem id="fac_inspection_menu_config" name="Configuration" sequence="90"
+              parent="fac_inspection_menu_root"/>
+
+    <menuitem id="fac_inspection_menu_spec" name="Inspection Standards" sequence="10"
+              parent="fac_inspection_menu_config" action="fac_inspection_spec_action"/>
+
+</odoo>

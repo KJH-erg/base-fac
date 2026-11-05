@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="res_groups_privilege_mes_work_order" model="res.groups.privilege">
+            <field name="name">작업지시</field>
+            <field name="sequence">30</field>
+            <field name="category_id" ref="base.module_category_supply_chain"/>
+        </record>
+
+        <record id="group_mes_worker" model="res.groups">
+            <field name="name">작업자</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_mes_work_order"/>
+            <field name="comment">현장 작업자: 작업지시를 조회하고, 본인 담당 작업지시를 착수·보류·재개·완료하며 공정 단계를 완료 표시한다.</field>
+        </record>
+
+        <record id="group_mes_manager" model="res.groups">
+            <field name="name">관리자</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_mes_work_order"/>
+            <field name="implied_ids" eval="[(4, ref('group_mes_worker'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">생산 관리자: 작업지시 생성·수정·확정·취소·삭제, 일괄 담당자 지정을 포함한 모든 작업을 할 수 있다.</field>
+        </record>
+    </data>
+</odoo>

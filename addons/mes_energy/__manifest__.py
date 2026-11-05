@@ -1,0 +1,22 @@
+{
+    'name': '에너지',
+    'version': '20.0.1.0.0',
+    'summary': '설비별 일일 전력·용수 사용량 기록과 기준 초과일 표시',
+    'category': 'Manufacturing',
+    'depends': ['base'],
+    'data': [
+        'security/mes_energy_security.xml',
+        'security/ir.access.csv',
+        'views/equipment_views.xml',
+        'views/usage_views.xml',
+        'views/monthly_report_views.xml',
+        'wizard/month_close_wizard_views.xml',
+        'views/month_close_views.xml',
+        'wizard/import_wizard_views.xml',
+        'views/menus.xml',
+        'data/ir_cron.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
+}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_equipment_cnc1" model="fac.equipment">
+        <field name="name">CNC Lathe #1</field>
+        <field name="code">EQ-CNC-01</field>
+        <field name="category">Machining</field>
+        <field name="location">Line A</field>
+    </record>
+
+    <record id="demo_equipment_cnc2" model="fac.equipment">
+        <field name="name">CNC Lathe #2</field>
+        <field name="code">EQ-CNC-02</field>
+        <field name="category">Machining</field>
+        <field name="location">Line A</field>
+    </record>
+
+    <record id="demo_equipment_press" model="fac.equipment">
+        <field name="name">Hydraulic Press</field>
+        <field name="code">EQ-PRS-01</field>
+        <field name="category">Forming</field>
+        <field name="location">Line B</field>
+    </record>
+
+    <record id="demo_equipment_robot" model="fac.equipment">
+        <field name="name">Welding Robot</field>
+        <field name="code">EQ-ROB-01</field>
+        <field name="category">Welding</field>
+        <field name="location">Line B</field>
+    </record>
+
+    <!-- Move some demo equipment through the status buttons so the history is not empty. -->
+    <function model="fac.equipment" name="action_set_in_use" eval="[[ref('demo_equipment_cnc2')]]"/>
+    <function model="fac.equipment" name="action_set_maintenance" eval="[[ref('demo_equipment_press')]]"/>
+    <function model="fac.equipment" name="action_set_broken" eval="[[ref('demo_equipment_robot')]]"/>
+
+</odoo>

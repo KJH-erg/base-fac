@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="fac_equipment_menu_root" name="FAC Equipment" sequence="200"
+              groups="base.group_user"/>
+
+    <menuitem id="fac_equipment_menu_equipment" name="Equipment" sequence="10"
+              parent="fac_equipment_menu_root" action="fac_equipment_action"/>
+
+    <menuitem id="fac_equipment_menu_status_log" name="Status History" sequence="20"
+              parent="fac_equipment_menu_root" action="fac_equipment_status_log_action"/>
+
+</odoo>

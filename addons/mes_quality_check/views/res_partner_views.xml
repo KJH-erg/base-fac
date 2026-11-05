@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_mes_qc" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.mes.quality.check</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_open_mes_qc_inspections" type="object"
+                        class="oe_stat_button" icon="list_alt"
+                        groups="mes_quality_check.group_mes_qc_inspector">
+                    <field name="mes_qc_inspection_count" widget="statinfo" string="검사 수"/>
+                </button>
+                <button name="action_open_mes_qc_failed_inspections" type="object"
+                        class="oe_stat_button" icon="error"
+                        groups="mes_quality_check.group_mes_qc_inspector">
+                    <field name="mes_qc_failed_count" widget="statinfo" string="불합격 수"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="mes_qc_partner_action" model="ir.actions.act_window">
+        <field name="name">공급처</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">공급처(거래처)를 등록하십시오.</p>
+            <p>공급처 상세에서 완료된 검사 수와 불합격 수를 볼 수 있습니다.</p>
+        </field>
+    </record>
+</odoo>

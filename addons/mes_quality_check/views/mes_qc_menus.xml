@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_mes_qc_root" name="품질검사" sequence="60"
+              groups="mes_quality_check.group_mes_qc_inspector"/>
+
+    <menuitem id="menu_mes_qc_inspection" name="검사" parent="menu_mes_qc_root"
+              action="mes_qc_inspection_action" sequence="10"
+              groups="mes_quality_check.group_mes_qc_inspector"/>
+
+    <menuitem id="menu_mes_qc_ncr" name="부적합 보고서" parent="menu_mes_qc_root"
+              action="mes_qc_ncr_action" sequence="20"
+              groups="mes_quality_check.group_mes_qc_inspector"/>
+
+    <menuitem id="menu_mes_qc_partner" name="공급처" parent="menu_mes_qc_root"
+              action="mes_qc_partner_action" sequence="30"
+              groups="mes_quality_check.group_mes_qc_inspector"/>
+
+    <menuitem id="menu_mes_qc_config" name="설정" parent="menu_mes_qc_root" sequence="90"
+              groups="mes_quality_check.group_mes_qc_inspector"/>
+
+    <menuitem id="menu_mes_qc_item" name="검사 항목" parent="menu_mes_qc_config"
+              action="mes_qc_item_action" sequence="10"
+              groups="mes_quality_check.group_mes_qc_inspector"/>
+</odoo>
